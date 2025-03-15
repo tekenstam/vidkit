@@ -84,15 +84,7 @@ sudo mv vidkit /usr/local/bin/  # Optional: move to a directory in your PATH
 
 ### Option 2: Build from Source
 
-If you prefer to build from source:
-
-1. Ensure you have Go 1.21 or later installed
-2. Clone the repository and build:
-```bash
-git clone https://github.com/tekenstam/vidkit.git
-cd vidkit
-go build -o vidkit
-```
+If you prefer to build from source, see the [Building From Source](#building-from-source) section under Development.
 
 ### API Key Setup (for metadata features)
 
@@ -238,7 +230,7 @@ cd vidkit
 go build -o vidkit ./cmd/vidkit
 ```
 
-See the [Installation](#installation) section for simpler options using pre-built binaries.
+For regular users, pre-built binaries are the recommended option. See the [Installation](#installation) section.
 
 ### Code Quality
 
