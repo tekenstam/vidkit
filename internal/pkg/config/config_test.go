@@ -15,8 +15,8 @@ func TestDefaultConfig(t *testing.T) {
 		t.Errorf("Default language = %v, want %v", cfg.Language, "en")
 	}
 
-	if cfg.MovieFormat != "{title} ({year}) [{resolution} {codec}]" {
-		t.Errorf("Default movie format = %v, want %v", cfg.MovieFormat, "{title} ({year}) [{resolution} {codec}]")
+	if cfg.MovieFilenameTemplate != "{title} ({year}) [{resolution} {codec}]" {
+		t.Errorf("Default movie format = %v, want %v", cfg.MovieFilenameTemplate, "{title} ({year}) [{resolution} {codec}]")
 	}
 
 	if cfg.Separator != " " {
@@ -34,7 +34,7 @@ func TestDefaultConfig(t *testing.T) {
 
 	// Check file extensions - updated to match the current defaults
 	expectedExts := []string{
-		".mp4", ".mkv", ".avi", ".mov", ".wmv", ".m4v", ".mpg", ".mpeg", ".webm", ".flv", ".ts", ".m2ts", ".mts", ".mxf",
+		".mp4", ".mkv", ".avi", ".mov", ".m4v",
 	}
 	if !reflect.DeepEqual(cfg.FileExtensions, expectedExts) {
 		t.Errorf("Default file extensions = %v, want %v", cfg.FileExtensions, expectedExts)
@@ -50,13 +50,13 @@ func TestValidateConfig(t *testing.T) {
 		{
 			name: "Valid config",
 			config: &Config{
-				Separator:     " ",
-				Language:      "en",
-				MovieFormat:   "{title} ({year})",
-				TVFormat:      "{title} S{season:02d}E{episode:02d}",
-				MovieProvider: ProviderTMDb,
-				TVProvider:    ProviderTVMaze,
-				TMDbAPIKey:    "test_key",
+				Separator:            " ",
+				Language:             "en",
+				MovieFilenameTemplate: "{title} ({year})",
+				TVFilenameTemplate:    "{title} S{season:02d}E{episode:02d}",
+				MovieProvider:        ProviderTMDb,
+				TVProvider:           ProviderTVMaze,
+				TMDbAPIKey:           "test_key",
 			},
 			wantError: false,
 		},
@@ -68,32 +68,30 @@ func TestValidateConfig(t *testing.T) {
 		{
 			name: "Config with formats but without API key",
 			config: &Config{
-				MovieFormat:   "{title} ({year})",
-				TVFormat:      "{title} S{season:02d}E{episode:02d}",
-				MovieProvider: ProviderTMDb,
-				NoMetadata:    true, // No metadata lookup, so no API key needed
+				MovieFilenameTemplate: "{title} ({year})",
+				TVFilenameTemplate:    "{title} S{season:02d}E{episode:02d}",
+				MovieProvider:        ProviderTMDb,
+				NoMetadata:           true, // No metadata lookup, so no API key needed
 			},
 			wantError: false,
 		},
 		{
 			name: "TMDb provider without API key",
 			config: &Config{
-				MovieFormat:    "{title} ({year})",
-				TVFormat:       "{title} S{season:02d}E{episode:02d}",
-				MovieProvider:  ProviderTMDb,
-				EnableMetadata: true,
-				NoMetadata:     false,
+				MovieFilenameTemplate: "{title} ({year})",
+				TVFilenameTemplate:    "{title} S{season:02d}E{episode:02d}",
+				MovieProvider:        ProviderTMDb,
+				NoMetadata:           false,
 			},
 			wantError: true,
 		},
 		{
 			name: "OMDb provider without API key",
 			config: &Config{
-				MovieFormat:    "{title} ({year})",
-				TVFormat:       "{title} S{season:02d}E{episode:02d}",
-				MovieProvider:  ProviderOMDb,
-				EnableMetadata: true,
-				NoMetadata:     false,
+				MovieFilenameTemplate: "{title} ({year})",
+				TVFilenameTemplate:    "{title} S{season:02d}E{episode:02d}",
+				MovieProvider:        ProviderOMDb,
+				NoMetadata:           false,
 			},
 			wantError: true,
 		},
@@ -128,16 +126,16 @@ func TestLoadAndSaveConfig(t *testing.T) {
 
 	// Test saving a config
 	testConfig := &Config{
-		TMDbAPIKey:     "test_key",
-		OMDbAPIKey:     "test_omdb_key",
-		TVDbAPIKey:     "test_tvdb_key",
-		Language:       "es",
-		Separator:      ".",
-		MovieFormat:    "Custom {title} ({year})",
-		TVFormat:       "Custom {title} S{season:02d}E{episode:02d}",
-		FileExtensions: []string{".mp4", ".mkv"},
-		MovieProvider:  ProviderOMDb,
-		TVProvider:     ProviderTVDb,
+		TMDbAPIKey:            "test_key",
+		OMDbAPIKey:            "test_omdb_key",
+		TVDbAPIKey:            "test_tvdb_key",
+		Language:              "es",
+		Separator:             ".",
+		MovieFilenameTemplate: "Custom {title} ({year})",
+		TVFilenameTemplate:    "Custom {title} S{season:02d}E{episode:02d}",
+		FileExtensions:        []string{".mp4", ".mkv"},
+		MovieProvider:         ProviderOMDb,
+		TVProvider:            ProviderTVDb,
 	}
 
 	err = SaveConfig(testConfig)
@@ -173,8 +171,8 @@ func TestLoadAndSaveConfig(t *testing.T) {
 		t.Errorf("Loaded language = %v, want %v", loadedConfig.Language, testConfig.Language)
 	}
 
-	if loadedConfig.MovieFormat != testConfig.MovieFormat {
-		t.Errorf("Loaded movie format = %v, want %v", loadedConfig.MovieFormat, testConfig.MovieFormat)
+	if loadedConfig.MovieFilenameTemplate != testConfig.MovieFilenameTemplate {
+		t.Errorf("Loaded movie format = %v, want %v", loadedConfig.MovieFilenameTemplate, testConfig.MovieFilenameTemplate)
 	}
 
 	if loadedConfig.MovieProvider != testConfig.MovieProvider {

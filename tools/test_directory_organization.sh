@@ -69,7 +69,7 @@ test_movie_organization() {
   
   echo -e "\n--- $test_name ---"
   echo "Testing pattern: $pattern"
-  ./vidkit --preview $NO_METADATA --movie-dir "$pattern" "$video_file" 2>&1 | tee output.log
+  ./vidkit --preview $NO_METADATA --movie-directory-template "$pattern" "$video_file" 2>&1 | tee output.log
   
   # Check output for basic organization information
   if grep -q "would be organized" output.log || grep -q "test_results" output.log || grep -q "Resolution:" output.log; then
@@ -87,7 +87,7 @@ test_tv_organization() {
   
   echo -e "\n--- $test_name ---"
   echo "Testing pattern: $pattern"
-  ./vidkit --preview $NO_METADATA --tv-dir "$pattern" "$video_file" 2>&1 | tee output.log
+  ./vidkit --preview $NO_METADATA --tv-directory-template "$pattern" "$video_file" 2>&1 | tee output.log
   
   # Check output for basic organization information
   if grep -q "would be organized" output.log || grep -q "test_results" output.log || grep -q "Resolution:" output.log; then
@@ -166,7 +166,7 @@ if [ -z "$NO_METADATA" ]; then
 
   # Test OMDb provider with movie organization
   echo -e "\n--- OMDb Movie Provider with Organization ---"
-  ./vidkit --preview --movie-provider omdb --movie-dir "test_results/Movies (OMDb)/{genre}/{title} ({year})" "$MOVIE_FILE" 2>&1 | tee output.log
+  ./vidkit --preview --movie-provider omdb --movie-directory-template "test_results/Movies (OMDb)/{genre}/{title} ({year})" "$MOVIE_FILE" 2>&1 | tee output.log
   if grep -q "would be organized" output.log || grep -q "test_results" output.log; then
     report_test_result "OMDb Provider Organization" 0 ""
   else
@@ -175,7 +175,7 @@ if [ -z "$NO_METADATA" ]; then
 
   # Test TVDb provider with TV organization
   echo -e "\n--- TVDb TV Provider with Organization ---"
-  ./vidkit --preview --tv-provider tvdb --tv-dir "test_results/TV Shows (TVDb)/{network}/{title}/S{season:02d}" "$TV_FILE" 2>&1 | tee output.log
+  ./vidkit --preview --tv-provider tvdb --tv-directory-template "test_results/TV Shows (TVDb)/{network}/{title}/S{season:02d}" "$TV_FILE" 2>&1 | tee output.log
   if grep -q "would be organized" output.log || grep -q "test_results" output.log; then
     report_test_result "TVDb Provider Organization" 0 ""
   else
