@@ -56,9 +56,11 @@ chmod 555 test_results/errors/readonly
 if [ -d "test_videos" ] && [ -n "$(ls -A test_videos/*.mp4 2>/dev/null)" ]; then
   # Find a test video
   TEST_VIDEO=$(ls test_videos/*.mp4 | head -1)
-  ./vidkit --preview --batch $NO_METADATA --movie-directory-template "test_results/errors/readonly" "$TEST_VIDEO" 2>&1 | tee output.log
-  if ! grep -q "Error\|Permission\|Failed" output.log; then
+  # Run without preview to actually try writing to the directory
+  ./vidkit --batch $NO_METADATA --movie-directory-template "test_results/errors/readonly" "$TEST_VIDEO" 2>&1 | tee output.log
+  if ! grep -q "Error\|Permission\|Failed\|denied" output.log; then
     echo "❌ Failed: Should report error for read-only directory"
+    exit 1
   else
     echo "✅ Passed: Correctly reported error for read-only directory"
   fi
