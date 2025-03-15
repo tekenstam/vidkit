@@ -1,6 +1,15 @@
 # vidkit
 
-A powerful command-line toolkit for video file analysis, organization, and metadata management.
+VidKit is an intelligent video file management system for media enthusiasts and collectors. This powerful Go-based CLI tool organizes your media library with metadata-driven intelligence - analyzing video files, fetching metadata from trusted sources, and intelligently renaming and organizing your content following configurable patterns.
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/tekenstam/vidkit)](https://goreportcard.com/report/github.com/tekenstam/vidkit)
+[![License](https://img.shields.io/github/license/tekenstam/vidkit)](LICENSE)
+
+## Overview
+
+VidKit solves the chaos of unorganized media collections by combining technical video analysis with rich metadata to create a perfectly structured library. Whether you're organizing a personal collection or preparing content for a media server, VidKit handles the heavy lifting - from video codec detection to fetching episode titles and organizing by genre.
+
+Built with Go 1.21+ and powered by FFmpeg, VidKit brings professional media management capabilities to your command line.
 
 ## Features
 
