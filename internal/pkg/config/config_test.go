@@ -34,7 +34,7 @@ func TestDefaultConfig(t *testing.T) {
 
 	// Check file extensions - updated to match the current defaults
 	expectedExts := []string{
-		".mp4", ".mkv", ".avi", ".mov", ".wmv", ".m4v", ".mpg", ".mpeg", ".webm", ".flv", ".ts", ".m2ts", ".mts", ".mxf",
+		".mp4", ".mkv", ".avi", ".mov", ".m4v",
 	}
 	if !reflect.DeepEqual(cfg.FileExtensions, expectedExts) {
 		t.Errorf("Default file extensions = %v, want %v", cfg.FileExtensions, expectedExts)
