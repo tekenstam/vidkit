@@ -1,0 +1,30 @@
+{
+  "tmdb_api_key": "YOUR_API_KEY_HERE",
+  "language": "en",
+  "movie_format": "{title} ({year}) [{resolution} {codec}]",
+  "tv_format": "{series} S{season:02d}E{episode:02d} [{resolution} {codec}]",
+  "batch_mode": false,
+  "recursive": false,
+  "lower_case": false,
+  "scene_style": false,
+  "no_overwrite": true,
+  "separator": " ",
+  "file_extensions": [
+    ".mp4",
+    ".mkv",
+    ".avi",
+    ".mov",
+    ".wmv",
+    ".flv",
+    ".webm",
+    ".m4v",
+    ".mpg",
+    ".mpeg",
+    ".3gp"
+  ],
+  "ignore_patterns": [
+    "sample",
+    "trailer",
+    "extra"
+  ]
+}
