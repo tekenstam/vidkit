@@ -1,5 +1,16 @@
 #!/bin/bash
 # Test script for VidKit's error handling capabilities
+# 
+# Usage:
+#   ./test_error_handling.sh           # Run with metadata lookups (requires API keys)
+#   ./test_error_handling.sh --no-metadata  # Run without metadata lookups (for CI)
+
+# Check for --no-metadata flag
+NO_METADATA=""
+if [[ "$*" == *"--no-metadata"* ]]; then
+  NO_METADATA="--no-metadata"
+  echo "Running in no-metadata mode (offline)"
+fi
 
 # Set up test environment
 echo "=== Testing Error Handling ==="

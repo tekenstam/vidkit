@@ -121,15 +121,30 @@ test-resolution: build
 	@echo "=== Testing resolution and video quality detection ==="
 	./tools/test_resolution.sh
 
+# Test resolution detection in CI (no metadata)
+test-resolution-ci: build
+	@echo "=== Testing resolution and video quality detection in CI ==="
+	./tools/test_resolution.sh --no-metadata
+
 # Test error handling
 test-error-handling: build
 	@echo "=== Testing error handling ==="
 	./tools/test_error_handling.sh
 
+# Test error handling in CI (no metadata)
+test-error-handling-ci: build
+	@echo "=== Testing error handling in CI ==="
+	./tools/test_error_handling.sh --no-metadata
+
 # Test command-line interface
 test-cli: build
 	@echo "=== Testing command-line interface ==="
 	./tools/test_cli.sh
+
+# Test command-line interface in CI (no metadata)
+test-cli-ci: build
+	@echo "=== Testing command-line interface in CI ==="
+	./tools/test_cli.sh --no-metadata
 
 # Run all tests
 test-all: test test-race generate-test-videos test-tv-formats test-custom-format test-organization test-resolution test-error-handling test-cli

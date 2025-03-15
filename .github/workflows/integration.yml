@@ -50,13 +50,13 @@ jobs:
         run: make test-organization-ci
           
       - name: Test resolution detection
-        run: make test-resolution
+        run: make test-resolution-ci
           
       - name: Test error handling
-        run: make test-error-handling
+        run: make test-error-handling-ci
           
       - name: Test CLI functionality
-        run: make test-cli
+        run: make test-cli-ci
       
       - name: Archive test files on failure
         if: failure()

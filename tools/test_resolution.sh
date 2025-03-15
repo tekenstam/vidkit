@@ -1,6 +1,13 @@
 #!/bin/bash
 # Test script for VidKit's resolution and video quality detection features
 
+# Check for --no-metadata flag
+NO_METADATA=""
+if [[ "$*" == *"--no-metadata"* ]]; then
+  NO_METADATA="--no-metadata"
+  echo "Running in no-metadata mode (offline)"
+fi
+
 # Set up test environment
 echo "=== Testing Resolution and Video Quality Detection ==="
 mkdir -p test_results/resolution
@@ -81,7 +88,7 @@ echo -e "\n--- Testing resolution detection ---"
 
 # Test 480p detection
 echo "Testing 480p detection..."
-./vidkit --preview test_results/resolution/480p_video.mp4 | tee output.log
+./vidkit --preview $NO_METADATA test_results/resolution/480p_video.mp4 | tee output.log
 if ! grep -q "Resolution: 480p" output.log; then
   echo "❌ Failed to detect 480p resolution correctly"
   exit 1
@@ -91,7 +98,7 @@ fi
 
 # Test 720p detection
 echo -e "\nTesting 720p detection..."
-./vidkit --preview test_results/resolution/720p_video.mp4 | tee output.log
+./vidkit --preview $NO_METADATA test_results/resolution/720p_video.mp4 | tee output.log
 if ! grep -q "Resolution: 720p" output.log; then
   echo "❌ Failed to detect 720p resolution correctly"
   exit 1
@@ -101,7 +108,7 @@ fi
 
 # Test 1080p detection
 echo -e "\nTesting 1080p detection..."
-./vidkit --preview test_results/resolution/1080p_video.mp4 | tee output.log
+./vidkit --preview $NO_METADATA test_results/resolution/1080p_video.mp4 | tee output.log
 if ! grep -q "Resolution: 1080p" output.log; then
   echo "❌ Failed to detect 1080p resolution correctly"
   exit 1
@@ -111,7 +118,7 @@ fi
 
 # Test custom resolution detection
 echo -e "\nTesting custom resolution detection..."
-./vidkit --preview test_results/resolution/custom_resolution.mp4 | tee output.log
+./vidkit --preview $NO_METADATA test_results/resolution/custom_resolution.mp4 | tee output.log
 if ! grep -q "Resolution:" output.log; then
   echo "❌ Failed to detect custom resolution"
   exit 1
@@ -124,7 +131,7 @@ echo -e "\n--- Testing codec detection ---"
 
 # Test H.264 detection
 echo "Testing H.264 detection..."
-./vidkit --preview test_results/resolution/h264_video.mp4 | tee output.log
+./vidkit --preview $NO_METADATA test_results/resolution/h264_video.mp4 | tee output.log
 if ! grep -q "Codec: h264" output.log; then
   echo "❌ Failed to detect H.264 codec correctly"
   exit 1
@@ -137,7 +144,7 @@ echo -e "\n--- Testing frame rate detection ---"
 
 # Test 24fps detection
 echo "Testing 24fps detection..."
-./vidkit --preview test_results/resolution/24fps_video.mp4 | tee output.log
+./vidkit --preview $NO_METADATA test_results/resolution/24fps_video.mp4 | tee output.log
 if ! grep -q "Frame Rate: 24.00 fps" output.log; then
   echo "❌ Failed to detect 24fps correctly"
   exit 1
@@ -147,7 +154,7 @@ fi
 
 # Test 60fps detection
 echo -e "\nTesting 60fps detection..."
-./vidkit --preview test_results/resolution/60fps_video.mp4 | tee output.log
+./vidkit --preview $NO_METADATA test_results/resolution/60fps_video.mp4 | tee output.log
 if ! grep -q "Frame Rate: 60.00 fps" output.log; then
   echo "❌ Failed to detect 60fps correctly"
   exit 1
