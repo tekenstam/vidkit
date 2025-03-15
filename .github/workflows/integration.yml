@@ -32,6 +32,16 @@ jobs:
 
       - name: Install dependencies
         run: go mod download
+        
+      - name: Build VidKit
+        run: go build -o vidkit ./cmd/vidkit
+        
+      - name: Generate test videos
+        run: |
+          echo "Generating test videos using tools/generate_test_videos.sh..."
+          chmod +x ./tools/generate_test_videos.sh
+          ./tools/generate_test_videos.sh
+          echo "Number of test videos generated: $(ls -l test_videos/*.mp4 | wc -l)"
 
       - name: Run CI integration tests
         run: make ci-integration-test
