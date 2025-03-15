@@ -7,8 +7,8 @@ import (
 )
 
 type mockTMDbClient struct {
-	searchMoviesFunc   func(query string, urlOptions map[string]string) (*tmdb.SearchMovies, error)
-	movieDetailsFunc   func(id int, urlOptions map[string]string) (*tmdb.MovieDetails, error)
+	searchMoviesFunc func(query string, urlOptions map[string]string) (*tmdb.SearchMovies, error)
+	movieDetailsFunc func(id int, urlOptions map[string]string) (*tmdb.MovieDetails, error)
 }
 
 func (m *mockTMDbClient) GetSearchMovies(query string, urlOptions map[string]string) (*tmdb.SearchMovies, error) {
@@ -102,42 +102,42 @@ func TestTMDbProvider_SearchMovie(t *testing.T) {
 
 	// Even though we're skipping, let's keep some commented test code
 	// for future reference, but disable any problematic parts
-	
+
 	/*
-	t.Run("Successful search", func(t *testing.T) {
-		// Create a complete mock with all required fields
-		mockClient := &mockTMDbClient{
-			searchMoviesFunc: func(query string, urlOptions map[string]string) (*tmdb.SearchMovies, error) {
-				// Create a search results object - structure depends on actual tmdb package
-				return &tmdb.SearchMovies{}, nil
-			},
-			movieDetailsFunc: func(id int, urlOptions map[string]string) (*tmdb.MovieDetails, error) {
-				return &tmdb.MovieDetails{
-					Title:       "The Matrix",
-					ReleaseDate: "1999-03-31",
-					Overview:    "A computer hacker learns about the true nature of reality.",
-				}, nil
-			},
-		}
+		t.Run("Successful search", func(t *testing.T) {
+			// Create a complete mock with all required fields
+			mockClient := &mockTMDbClient{
+				searchMoviesFunc: func(query string, urlOptions map[string]string) (*tmdb.SearchMovies, error) {
+					// Create a search results object - structure depends on actual tmdb package
+					return &tmdb.SearchMovies{}, nil
+				},
+				movieDetailsFunc: func(id int, urlOptions map[string]string) (*tmdb.MovieDetails, error) {
+					return &tmdb.MovieDetails{
+						Title:       "The Matrix",
+						ReleaseDate: "1999-03-31",
+						Overview:    "A computer hacker learns about the true nature of reality.",
+					}, nil
+				},
+			}
 
-		provider := &TMDbProvider{
-			client: mockClient,
-		}
+			provider := &TMDbProvider{
+				client: mockClient,
+			}
 
-		search := MovieSearch{
-			Title: "The Matrix",
-			Year:  1999,
-		}
-		
-		// This would be the actual test if we weren't skipping
-		result, err := provider.SearchMovie(search, "en")
-		if err != nil {
-			t.Errorf("SearchMovie() error = %v, want nil", err)
-		}
-		if result != nil && result.Title != "The Matrix" {
-			t.Errorf("SearchMovie() title = %v, want The Matrix", result.Title)
-		}
-	})
+			search := MovieSearch{
+				Title: "The Matrix",
+				Year:  1999,
+			}
+
+			// This would be the actual test if we weren't skipping
+			result, err := provider.SearchMovie(search, "en")
+			if err != nil {
+				t.Errorf("SearchMovie() error = %v, want nil", err)
+			}
+			if result != nil && result.Title != "The Matrix" {
+				t.Errorf("SearchMovie() title = %v, want The Matrix", result.Title)
+			}
+		})
 	*/
 }
 

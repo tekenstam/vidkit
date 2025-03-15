@@ -145,15 +145,15 @@ func TestTVDbProvider_SearchTVShow(t *testing.T) {
 	defer server.Close()
 
 	tests := []struct {
-		name       string
-		search     TVShowSearch
-		language   string
-		wantTitle  string
-		wantYear   int
-		wantSeason int
-		wantEp     int
+		name        string
+		search      TVShowSearch
+		language    string
+		wantTitle   string
+		wantYear    int
+		wantSeason  int
+		wantEp      int
 		wantEpTitle string
-		wantErr    bool
+		wantErr     bool
 	}{
 		{
 			name: "Successful search",
@@ -162,13 +162,13 @@ func TestTVDbProvider_SearchTVShow(t *testing.T) {
 				Season:  1,
 				Episode: 5,
 			},
-			language:   "en",
-			wantTitle:  "Breaking Bad",
-			wantYear:   2008,
-			wantSeason: 1,
-			wantEp:     5,
+			language:    "en",
+			wantTitle:   "Breaking Bad",
+			wantYear:    2008,
+			wantSeason:  1,
+			wantEp:      5,
 			wantEpTitle: "Gray Matter",
-			wantErr:    false,
+			wantErr:     false,
 		},
 		{
 			name: "Show not found",
@@ -177,13 +177,13 @@ func TestTVDbProvider_SearchTVShow(t *testing.T) {
 				Season:  1,
 				Episode: 1,
 			},
-			language:   "en",
-			wantTitle:  "",
-			wantYear:   0,
-			wantSeason: 0,
-			wantEp:     0,
+			language:    "en",
+			wantTitle:   "",
+			wantYear:    0,
+			wantSeason:  0,
+			wantEp:      0,
 			wantEpTitle: "",
-			wantErr:    true,
+			wantErr:     true,
 		},
 	}
 
@@ -191,7 +191,7 @@ func TestTVDbProvider_SearchTVShow(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Skip this test for now to avoid actual network calls
 			t.Skip("Skipping TVDb test to avoid external API calls")
-			
+
 			// Create a provider that uses our mock server
 			provider := &TVDbProvider{
 				apiKey:  "test_api_key",

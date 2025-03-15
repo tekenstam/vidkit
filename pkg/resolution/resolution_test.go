@@ -19,8 +19,8 @@ func TestGetStandardResolution(t *testing.T) {
 		{"Exact 720p", 1280, 720, "720p"},
 		{"Exact 480p", 640, 480, "480p"},
 		{"Exact 360p", 640, 360, "360p"},
-		{"Near 1080p", 1920, 1082, "1080p"},  // Within tolerance
-		{"Near 720p", 1280, 715, "720p"},      // Within tolerance
+		{"Near 1080p", 1920, 1082, "1080p"},     // Within tolerance
+		{"Near 720p", 1280, 715, "720p"},        // Within tolerance
 		{"Near 1080p Low", 1920, 1075, "1080p"}, // Within tolerance
 		{"Custom Resolution", 1600, 900, "900p"},
 		{"Very Low Resolution", 320, 240, "240p"},

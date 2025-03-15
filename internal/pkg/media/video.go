@@ -12,12 +12,12 @@ import (
 // VideoInfo represents the structure of ffprobe JSON output
 type VideoInfo struct {
 	Format struct {
-		Filename    string `json:"filename"`
-		FormatName  string `json:"format_name"`
-		Duration    string `json:"duration"`
-		Size        string `json:"size"`
-		BitRate     string `json:"bit_rate"`
-		ProbeScore  int    `json:"probe_score"`
+		Filename   string `json:"filename"`
+		FormatName string `json:"format_name"`
+		Duration   string `json:"duration"`
+		Size       string `json:"size"`
+		BitRate    string `json:"bit_rate"`
+		ProbeScore int    `json:"probe_score"`
 	} `json:"format"`
 	Streams []struct {
 		CodecType     string `json:"codec_type"`
@@ -107,15 +107,15 @@ func FormatSize(sizeStr string) string {
 	if err != nil {
 		return sizeStr + " bytes"
 	}
-	
+
 	units := []string{"B", "KB", "MB", "GB", "TB"}
 	unitIndex := 0
-	
+
 	for size >= 1024 && unitIndex < len(units)-1 {
 		size /= 1024
 		unitIndex++
 	}
-	
+
 	return fmt.Sprintf("%.2f %s", size, units[unitIndex])
 }
 

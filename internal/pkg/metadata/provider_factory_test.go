@@ -9,11 +9,11 @@ import (
 
 func TestCreateMovieProvider(t *testing.T) {
 	tests := []struct {
-		name          string
-		providerType  config.ProviderType
-		apiKey        string
-		expectError   bool
-		expectedType  string
+		name         string
+		providerType config.ProviderType
+		apiKey       string
+		expectError  bool
+		expectedType string
 	}{
 		{
 			name:         "TMDb Provider",
@@ -58,7 +58,7 @@ func TestCreateMovieProvider(t *testing.T) {
 			cfg := &config.Config{
 				MovieProvider: tt.providerType,
 			}
-			
+
 			// Set the appropriate API key based on provider type
 			switch tt.providerType {
 			case config.ProviderTMDb:
@@ -66,21 +66,21 @@ func TestCreateMovieProvider(t *testing.T) {
 			case config.ProviderOMDb:
 				cfg.OMDbAPIKey = tt.apiKey
 			}
-			
+
 			// Call the factory function
 			provider, err := CreateMovieProvider(cfg)
-			
+
 			// Check if we got expected error status
 			if (err != nil) != tt.expectError {
 				t.Errorf("CreateMovieProvider() error = %v, expectError %v", err, tt.expectError)
 				return
 			}
-			
+
 			// If we expect an error, no need to check the provider type
 			if tt.expectError {
 				return
 			}
-			
+
 			// Check if we got the expected provider type
 			providerType := fmt.Sprintf("%T", provider)
 			if providerType != tt.expectedType {
@@ -92,11 +92,11 @@ func TestCreateMovieProvider(t *testing.T) {
 
 func TestCreateTVShowProvider(t *testing.T) {
 	tests := []struct {
-		name          string
-		providerType  config.ProviderType
-		apiKey        string
-		expectError   bool
-		expectedType  string
+		name         string
+		providerType config.ProviderType
+		apiKey       string
+		expectError  bool
+		expectedType string
 	}{
 		{
 			name:         "TvMaze Provider",
@@ -134,26 +134,26 @@ func TestCreateTVShowProvider(t *testing.T) {
 			cfg := &config.Config{
 				TVProvider: tt.providerType,
 			}
-			
+
 			// Set the appropriate API key based on provider type
 			if tt.providerType == config.ProviderTVDb {
 				cfg.TVDbAPIKey = tt.apiKey
 			}
-			
+
 			// Call the factory function
 			provider, err := CreateTVShowProvider(cfg)
-			
+
 			// Check if we got expected error status
 			if (err != nil) != tt.expectError {
 				t.Errorf("CreateTVShowProvider() error = %v, expectError %v", err, tt.expectError)
 				return
 			}
-			
+
 			// If we expect an error, no need to check the provider type
 			if tt.expectError {
 				return
 			}
-			
+
 			// Check if we got the expected provider type
 			providerType := fmt.Sprintf("%T", provider)
 			if providerType != tt.expectedType {
@@ -200,21 +200,21 @@ func TestGetProvider(t *testing.T) {
 				OMDbAPIKey:    "test_omdb_key",
 				TVDbAPIKey:    "test_tvdb_key",
 			}
-			
+
 			// Call the function
 			provider, err := GetProvider(cfg, tt.isTV)
-			
+
 			// Check if we got expected error status
 			if (err != nil) != tt.expectError {
 				t.Errorf("GetProvider() error = %v, expectError %v", err, tt.expectError)
 				return
 			}
-			
+
 			// If we expect an error, no need to check the provider type
 			if tt.expectError {
 				return
 			}
-			
+
 			// Check if we got the expected provider type
 			providerType := fmt.Sprintf("%T", provider)
 			if providerType != tt.expectedType {

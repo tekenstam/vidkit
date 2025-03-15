@@ -26,10 +26,10 @@ type MovieMetadata struct {
 
 // TVShowSearch represents a TV show search request
 type TVShowSearch struct {
-	Title       string
-	Year        int
-	Season      int
-	Episode     int
+	Title        string
+	Year         int
+	Season       int
+	Episode      int
 	EpisodeTitle string
 }
 
@@ -51,7 +51,7 @@ type TVShowMetadata struct {
 // MetadataProvider defines the interface for metadata providers
 type MetadataProvider interface {
 	SearchMovie(search MovieSearch, language string) (*MovieMetadata, error)
-	SearchTVShow(search TVShowSearch, language string) (*TVShowMetadata, error) 
+	SearchTVShow(search TVShowSearch, language string) (*TVShowMetadata, error)
 }
 
 // TMDbClient defines the interface for TMDb operations
@@ -85,7 +85,7 @@ func (p *TMDbProvider) SearchMovie(search MovieSearch, language string) (*MovieM
 	options := map[string]string{
 		"language": language,
 	}
-	
+
 	// If we have a year, add it to improve search accuracy
 	if search.Year > 0 {
 		options["year"] = strconv.Itoa(search.Year)
@@ -142,14 +142,14 @@ func (p *TMDbProvider) SearchTVShow(search TVShowSearch, language string) (*TVSh
 func ExtractMovieInfo(filename string) MovieSearch {
 	// Extract base name without extension
 	basename := strings.TrimSuffix(filepath.Base(filename), filepath.Ext(filename))
-	
+
 	// Check if it's a TV show pattern first
 	tvInfo := ExtractTVShowInfo(filename)
 	if tvInfo.Season > 0 && tvInfo.Episode > 0 {
 		// This is a TV show filename, not a movie
 		return MovieSearch{Title: "", Year: 0}
 	}
-	
+
 	// Look for year pattern (YYYY) in filename, but only in delimiters
 	// Only accept years in parentheses or square brackets
 	yearPattern := regexp.MustCompile(`\((\d{4})\)|\[(\d{4})\]`)
@@ -181,8 +181,8 @@ func ExtractMovieInfo(filename string) MovieSearch {
 		// For files without valid delimited years, just return the original
 		// This preserves formats like "The.Matrix.1999.mp4"
 		return MovieSearch{
-			Title: basename, 
-			Year: 0,
+			Title: basename,
+			Year:  0,
 		}
 	}
 
@@ -196,22 +196,22 @@ func ExtractMovieInfo(filename string) MovieSearch {
 func ExtractTVShowInfo(filename string) TVShowSearch {
 	// Extract base name without extension
 	basename := strings.TrimSuffix(filepath.Base(filename), filepath.Ext(filename))
-	
+
 	// Look for common TV show patterns
 	// Pattern 1: ShowName.S01E02
 	seasonEpisodePattern1 := regexp.MustCompile(`(?i)(.*?)[\s\._-]*s(\d{1,2})[\s\._-]*e(\d{1,2})(?:[\s\._-]*(.*))?`)
-	
+
 	// Pattern 2: ShowName.1x02
 	seasonEpisodePattern2 := regexp.MustCompile(`(?i)(.*?)[\s\._-]*(\d{1,2})x(\d{1,2})(?:[\s\._-]*(.*))?`)
-	
+
 	// Pattern 3: ShowName.Season.1.Episode.2
 	seasonEpisodePattern3 := regexp.MustCompile(`(?i)(.*?)[\s\._-]*(?:season|s)[\s\._-]*(\d{1,2})[\s\._-]*(?:episode|ep|e)[\s\._-]*(\d{1,2})(?:[\s\._-]*(.*))?`)
-	
+
 	// Try all season/episode patterns
 	var title string
 	var season, episode int
 	var episodeTitle string
-	
+
 	if m := seasonEpisodePattern1.FindStringSubmatch(basename); len(m) >= 4 {
 		title = m[1]
 		season, _ = strconv.Atoi(m[2])
@@ -239,12 +239,12 @@ func ExtractTVShowInfo(filename string) TVShowSearch {
 			Title: cleanTitle(basename),
 		}
 	}
-	
+
 	// Look for year pattern (YYYY) in title, but only in delimiters
 	// Only accept years in parentheses or square brackets
 	yearPattern := regexp.MustCompile(`\((\d{4})\)|\[(\d{4})\]`)
 	year := 0
-	
+
 	// Try all possible year patterns
 	for _, matches := range yearPattern.FindAllStringSubmatch(title, -1) {
 		for i := 1; i < len(matches); i++ {
@@ -261,24 +261,24 @@ func ExtractTVShowInfo(filename string) TVShowSearch {
 			break
 		}
 	}
-	
+
 	// Clean up the titles
 	title = cleanTitle(title)
-	
+
 	// Clean up episode title - filter out quality and technical info
 	if episodeTitle != "" {
 		// List of common quality/codec terms to filter out
 		qualityTerms := []string{"1080p", "720p", "480p", "HEVC", "h264", "x264", "HDRip", "BRRip", "BluRay", "WEB-DL", "HDTV"}
-		
+
 		cleanEpisodeTitle := episodeTitle
-		
+
 		for _, term := range qualityTerms {
 			if strings.Contains(strings.ToLower(episodeTitle), strings.ToLower(term)) {
 				// If episode title is just a quality indicator, set it to empty
 				cleanEpisodeTitle = regexp.MustCompile(`(?i)`+term).ReplaceAllString(cleanEpisodeTitle, "")
 			}
 		}
-		
+
 		// If after removing all quality terms, only spaces remain, consider it empty
 		if strings.TrimSpace(cleanEpisodeTitle) == "" {
 			episodeTitle = ""
@@ -286,12 +286,12 @@ func ExtractTVShowInfo(filename string) TVShowSearch {
 			episodeTitle = cleanTitle(episodeTitle)
 		}
 	}
-	
+
 	return TVShowSearch{
-		Title:       title,
-		Year:        year,
-		Season:      season,
-		Episode:     episode,
+		Title:        title,
+		Year:         year,
+		Season:       season,
+		Episode:      episode,
 		EpisodeTitle: episodeTitle,
 	}
 }
@@ -318,9 +318,9 @@ func cleanTitle(title string) string {
 		".", " ",
 		"_", " ",
 	).Replace(title)
-	
+
 	// Clean up extra spaces
 	title = regexp.MustCompile(`\s+`).ReplaceAllString(strings.TrimSpace(title), " ")
-	
+
 	return title
 }

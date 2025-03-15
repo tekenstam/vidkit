@@ -19,21 +19,21 @@ type OMDbProvider struct {
 
 // OMDbResponse represents the response from the OMDb API
 type OMDbResponse struct {
-	Title      string `json:"Title"`
-	Year       string `json:"Year"`
-	Rated      string `json:"Rated"`
-	Released   string `json:"Released"`
-	Runtime    string `json:"Runtime"`
-	Genre      string `json:"Genre"`
-	Director   string `json:"Director"`
-	Writer     string `json:"Writer"`
-	Actors     string `json:"Actors"`
-	Plot       string `json:"Plot"`
-	Language   string `json:"Language"`
-	Country    string `json:"Country"`
-	Awards     string `json:"Awards"`
-	Poster     string `json:"Poster"`
-	Ratings    []struct {
+	Title    string `json:"Title"`
+	Year     string `json:"Year"`
+	Rated    string `json:"Rated"`
+	Released string `json:"Released"`
+	Runtime  string `json:"Runtime"`
+	Genre    string `json:"Genre"`
+	Director string `json:"Director"`
+	Writer   string `json:"Writer"`
+	Actors   string `json:"Actors"`
+	Plot     string `json:"Plot"`
+	Language string `json:"Language"`
+	Country  string `json:"Country"`
+	Awards   string `json:"Awards"`
+	Poster   string `json:"Poster"`
+	Ratings  []struct {
 		Source string `json:"Source"`
 		Value  string `json:"Value"`
 	} `json:"Ratings"`
@@ -72,7 +72,7 @@ func NewOMDbProvider(apiKey string) (*OMDbProvider, error) {
 	if apiKey == "" {
 		return nil, fmt.Errorf("OMDb API key is required")
 	}
-	
+
 	return &OMDbProvider{
 		apiKey:  apiKey,
 		baseURL: "http://www.omdbapi.com/",
@@ -95,27 +95,27 @@ func (p *OMDbProvider) SearchMovie(search MovieSearch, language string) (*MovieM
 	query.Set("apikey", p.apiKey)
 	query.Set("s", search.Title)
 	query.Set("type", "movie")
-	
+
 	// If we have a year, add it to improve search accuracy
 	if search.Year > 0 {
 		query.Set("y", strconv.Itoa(search.Year))
 	}
-	
+
 	searchURL.RawQuery = query.Encode()
-	
+
 	// Execute the search request
 	resp, err := p.client.Get(searchURL.String())
 	if err != nil {
 		return nil, fmt.Errorf("failed to search movie: %v", err)
 	}
 	defer resp.Body.Close()
-	
+
 	// Parse the response
 	var searchResp OMDbSearchResponse
 	if err := json.NewDecoder(resp.Body).Decode(&searchResp); err != nil {
 		return nil, fmt.Errorf("failed to decode search response: %v", err)
 	}
-	
+
 	// Check if the search was successful
 	if searchResp.Response != "True" {
 		// Try a more forgiving search without year if we had one
@@ -123,17 +123,17 @@ func (p *OMDbProvider) SearchMovie(search MovieSearch, language string) (*MovieM
 			// Remove year and try again
 			query.Del("y")
 			searchURL.RawQuery = query.Encode()
-			
+
 			resp, err := p.client.Get(searchURL.String())
 			if err != nil {
 				return nil, fmt.Errorf("failed to search movie without year: %v", err)
 			}
 			defer resp.Body.Close()
-			
+
 			if err := json.NewDecoder(resp.Body).Decode(&searchResp); err != nil {
 				return nil, fmt.Errorf("failed to decode search response: %v", err)
 			}
-			
+
 			if searchResp.Response != "True" {
 				return nil, fmt.Errorf("no movies found matching '%s'", search.Title)
 			}
@@ -141,14 +141,14 @@ func (p *OMDbProvider) SearchMovie(search MovieSearch, language string) (*MovieM
 			return nil, fmt.Errorf("no movies found matching '%s'", search.Title)
 		}
 	}
-	
+
 	if len(searchResp.Search) == 0 {
 		return nil, fmt.Errorf("no movies found matching '%s'", search.Title)
 	}
-	
+
 	// Get the first result's IMDb ID
 	imdbID := searchResp.Search[0].ImdbID
-	
+
 	// Now get the detailed information using the IMDb ID
 	detailURL, _ := url.Parse(p.baseURL)
 	detailQuery := detailURL.Query()
@@ -156,25 +156,25 @@ func (p *OMDbProvider) SearchMovie(search MovieSearch, language string) (*MovieM
 	detailQuery.Set("i", imdbID)
 	detailQuery.Set("plot", "full")
 	detailURL.RawQuery = detailQuery.Encode()
-	
+
 	// Execute the detail request
 	detailResp, err := p.client.Get(detailURL.String())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get movie details: %v", err)
 	}
 	defer detailResp.Body.Close()
-	
+
 	// Parse the detail response
 	var movie OMDbResponse
 	if err := json.NewDecoder(detailResp.Body).Decode(&movie); err != nil {
 		return nil, fmt.Errorf("failed to decode movie details: %v", err)
 	}
-	
+
 	// Check if the response was successful
 	if movie.Response != "True" {
 		return nil, fmt.Errorf("failed to get movie details: %s", movie.Error)
 	}
-	
+
 	// Extract the year from the year field
 	year := 0
 	if movie.Year != "" {
@@ -185,7 +185,7 @@ func (p *OMDbProvider) SearchMovie(search MovieSearch, language string) (*MovieM
 			year = y
 		}
 	}
-	
+
 	return &MovieMetadata{
 		Title:    movie.Title,
 		Year:     year,

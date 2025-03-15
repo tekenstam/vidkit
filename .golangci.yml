@@ -2,22 +2,36 @@ linters:
   enable:
     - gofmt
     - govet
-    - golint
-    - gosimple
     - staticcheck
+    - gosimple
     - ineffassign
     - misspell
     - unconvert
     - goconst
     - gocyclo
     - goimports
+    - errcheck
+    - typecheck
+    - unused
+    - bodyclose
+    - exportloopref
+    - gocritic
+    - goprintffuncname
+    - gosec
+    - nilerr
+    - revive
+    - stylecheck
+  disable:
+    - golint
 
 run:
-  deadline: 5m
+  timeout: 5m
   tests: true
   skip-dirs:
     - vendor/
     - test_videos/
+  skip-files:
+    - ".*\\.generated\\.go$"
 
 issues:
   exclude-rules:
@@ -25,6 +39,12 @@ issues:
       linters:
         - gocyclo
         - errcheck
+        - gosec
+    - linters:
+        - lll
+      source: "http(s)?://"
+  max-issues-per-linter: 0
+  max-same-issues: 0
 
 linters-settings:
   gocyclo:
@@ -32,3 +52,22 @@ linters-settings:
   goconst:
     min-len: 3
     min-occurrences: 3
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - style
+      - performance
+  revive:
+    rules:
+      - name: exported
+        severity: warning
+        disabled: false
+  lll:
+    line-length: 120
+  gosec:
+    excludes:
+      - G104
+  govet:
+    check-shadowing: true
+  unused:
+    check-exported: false

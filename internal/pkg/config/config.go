@@ -13,9 +13,9 @@ type ProviderType string
 
 const (
 	// Movie provider types
-	ProviderTMDb  ProviderType = "tmdb"
-	ProviderOMDb  ProviderType = "omdb"
-	
+	ProviderTMDb ProviderType = "tmdb"
+	ProviderOMDb ProviderType = "omdb"
+
 	// TV show provider types
 	ProviderTVMaze ProviderType = "tvmaze"
 	ProviderTVDb   ProviderType = "tvdb"
@@ -24,21 +24,21 @@ const (
 // Config holds application configuration
 type Config struct {
 	// Common options
-	TMDbAPIKey     string `json:"tmdb_api_key"`
-	OMDbAPIKey     string `json:"omdb_api_key"`
-	TVDbAPIKey     string `json:"tvdb_api_key"`
-	BatchMode      bool   `json:"batch_mode"`
-	Recursive      bool   `json:"recursive"`
-	LowerCase      bool   `json:"lowercase"`
-	SceneStyle     bool   `json:"scene_style"`
-	Separator      string `json:"separator"`
+	TMDbAPIKey     string   `json:"tmdb_api_key"`
+	OMDbAPIKey     string   `json:"omdb_api_key"`
+	TVDbAPIKey     string   `json:"tvdb_api_key"`
+	BatchMode      bool     `json:"batch_mode"`
+	Recursive      bool     `json:"recursive"`
+	LowerCase      bool     `json:"lowercase"`
+	SceneStyle     bool     `json:"scene_style"`
+	Separator      string   `json:"separator"`
 	FileExtensions []string `json:"file_extensions"`
-	Language       string `json:"language"`
-	NoOverwrite    bool   `json:"no_overwrite"`
-	NoMetadata     bool   `json:"no_metadata"`
-	PreviewMode    bool   `json:"preview_mode"`
-	EnableMetadata bool   `json:"enable_metadata"`
-	
+	Language       string   `json:"language"`
+	NoOverwrite    bool     `json:"no_overwrite"`
+	NoMetadata     bool     `json:"no_metadata"`
+	PreviewMode    bool     `json:"preview_mode"`
+	EnableMetadata bool     `json:"enable_metadata"`
+
 	// Provider selection
 	MovieProvider ProviderType `json:"movie_provider"`
 	TVProvider    ProviderType `json:"tv_provider"`
@@ -110,6 +110,16 @@ func LoadConfig() (*Config, error) {
 
 // ValidateConfig validates the configuration
 func ValidateConfig(cfg *Config) error {
+	// Apply default values if needed
+	if cfg.MovieFormat == "" {
+		cfg.MovieFormat = "{title} ({year}) [{resolution} {codec}]"
+	}
+
+	// Apply default TV format if needed
+	if cfg.TVFormat == "" {
+		cfg.TVFormat = "{title} S{season:02d}E{episode:02d} {episode_title} [{resolution} {codec}]"
+	}
+
 	// Check if metadata is enabled but no API key is provided
 	if !cfg.NoMetadata && cfg.EnableMetadata {
 		// Check based on selected providers
@@ -124,16 +134,6 @@ func ValidateConfig(cfg *Config) error {
 		}
 	}
 
-	// Validate movie format template
-	if cfg.MovieFormat == "" {
-		return errors.New("movie format template cannot be empty")
-	}
-
-	// Validate TV format template
-	if cfg.TVFormat == "" {
-		return errors.New("TV format template cannot be empty")
-	}
-
 	// Apply scene style settings
 	if cfg.SceneStyle && cfg.Separator == " " {
 		cfg.Separator = "."
@@ -145,24 +145,24 @@ func ValidateConfig(cfg *Config) error {
 // SaveConfig saves the configuration to the default location
 func SaveConfig(config *Config) error {
 	configPath := ConfigFilePath()
-	
+
 	// Create directory if it doesn't exist
 	configDir := filepath.Dir(configPath)
 	if err := os.MkdirAll(configDir, 0755); err != nil {
 		return fmt.Errorf("error creating config directory: %v", err)
 	}
-	
+
 	// Marshal config to JSON
 	data, err := json.MarshalIndent(config, "", "  ")
 	if err != nil {
 		return fmt.Errorf("error marshaling config: %v", err)
 	}
-	
+
 	// Write config to file
 	if err := os.WriteFile(configPath, data, 0644); err != nil {
 		return fmt.Errorf("error writing config file: %v", err)
 	}
-	
+
 	return nil
 }
 
@@ -182,7 +182,7 @@ func DefaultConfig() *Config {
 		LowerCase:      false,
 		SceneStyle:     false,
 		Separator:      " ",
-		FileExtensions: []string{".mp4", ".mkv", ".avi", ".mov", ".wmv", ".m4v", ".mpg", ".mpeg"},
+		FileExtensions: []string{".mp4", ".mkv", ".avi", ".mov", ".wmv", ".m4v", ".mpg", ".mpeg", ".webm", ".flv", ".ts", ".m2ts", ".mts", ".mxf"},
 		Language:       "en",
 		NoOverwrite:    true,
 		NoMetadata:     false,

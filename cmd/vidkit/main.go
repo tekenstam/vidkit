@@ -80,7 +80,7 @@ func processFile(path string, cfg *config.Config) error {
 
 func processTVShow(path string, info *media.VideoInfo, tvShowInfo metadata.TVShowSearch, cfg *config.Config) error {
 	fmt.Println("\n=== Looking up TV show metadata... ===")
-	
+
 	// Create a formatted search string
 	searchString := fmt.Sprintf("'%s'", tvShowInfo.Title)
 	if tvShowInfo.Year > 0 {
@@ -170,7 +170,7 @@ func processTVShow(path string, info *media.VideoInfo, tvShowInfo metadata.TVSho
 
 func processMovie(path string, info *media.VideoInfo, movieInfo metadata.MovieSearch, cfg *config.Config) error {
 	fmt.Println("\n=== Looking up movie metadata... ===")
-	
+
 	// Create a formatted search string
 	searchString := fmt.Sprintf("'%s'", movieInfo.Title)
 	if movieInfo.Year > 0 {
@@ -324,20 +324,20 @@ func generateFilename(originalPath string, info *media.VideoInfo, metadata *meta
 
 	// Replace variables in format string
 	name := format
-	
+
 	// Replace title
 	name = strings.ReplaceAll(name, "{title}", metadata.Title)
-	
+
 	// Replace year if available
 	yearStr := ""
 	if metadata.Year > 0 {
 		yearStr = fmt.Sprintf("%d", metadata.Year)
 	}
 	name = strings.ReplaceAll(name, "{year}", yearStr)
-	
+
 	// Replace resolution
 	name = strings.ReplaceAll(name, "{resolution}", resolutionStr)
-	
+
 	// Replace codec
 	name = strings.ReplaceAll(name, "{codec}", codec)
 
@@ -375,39 +375,39 @@ func generateTVFilename(originalPath string, info *media.VideoInfo, metadata *me
 
 	// Replace variables in format string
 	name := format
-	
+
 	// Replace title
 	name = strings.ReplaceAll(name, "{title}", metadata.Title)
-	
+
 	// Replace year if available
 	yearStr := ""
 	if metadata.Year > 0 {
 		yearStr = fmt.Sprintf("%d", metadata.Year)
 	}
 	name = strings.ReplaceAll(name, "{year}", yearStr)
-	
+
 	// Replace season
 	season := fmt.Sprintf("%d", metadata.Season)
 	seasonWithZero := fmt.Sprintf("%02d", metadata.Season)
 	name = strings.ReplaceAll(name, "{season:02d}", seasonWithZero)
 	name = strings.ReplaceAll(name, "{season}", season)
-	
+
 	// Replace episode
 	episode := fmt.Sprintf("%d", metadata.Episode)
 	episodeWithZero := fmt.Sprintf("%02d", metadata.Episode)
 	name = strings.ReplaceAll(name, "{episode:02d}", episodeWithZero)
 	name = strings.ReplaceAll(name, "{episode}", episode)
-	
+
 	// Replace episode title
 	episodeTitle := metadata.EpisodeTitle
 	if episodeTitle == "" {
 		episodeTitle = "Episode " + episode
 	}
 	name = strings.ReplaceAll(name, "{episode_title}", episodeTitle)
-	
+
 	// Replace resolution
 	name = strings.ReplaceAll(name, "{resolution}", resolutionStr)
-	
+
 	// Replace codec
 	name = strings.ReplaceAll(name, "{codec}", codec)
 
@@ -441,31 +441,31 @@ func main() {
 	// Define command-line flags
 	batchMode := flag.Bool("b", false, "Process automatically without prompts")
 	batchModeLong := flag.Bool("batch", false, "Process automatically without prompts")
-	
+
 	recursiveMode := flag.Bool("r", false, "Search subdirectories")
 	recursiveModeLong := flag.Bool("recursive", false, "Search subdirectories")
-	
+
 	lowerCase := flag.Bool("l", false, "Use lowercase for filenames")
 	lowerCaseLong := flag.Bool("lower", false, "Use lowercase for filenames")
-	
+
 	sceneStyle := flag.Bool("s", false, "Use dots instead of spaces in filenames")
 	sceneStyleLong := flag.Bool("scene", false, "Use dots instead of spaces in filenames")
-	
+
 	separator := flag.String("separator", " ", "Character to use as separator in filenames")
-	
+
 	noOverwrite := flag.Bool("no-overwrite", true, "Prevent renaming if it would overwrite a file")
-	
+
 	previewMode := flag.Bool("preview", false, "Show what would be done without making changes")
-	
+
 	noMetadata := flag.Bool("no-metadata", false, "Skip online metadata lookup")
-	
+
 	language := flag.String("lang", "en", "Metadata language (ISO 639-1 code)")
-	
+
 	movieFormat := flag.String("movie-format", "", "Custom format for movie files")
 	tvFormat := flag.String("tv-format", "", "Custom format for TV show files")
-	
+
 	showVersion := flag.Bool("version", false, "Show version information")
-	
+
 	// Add new flags for provider selection
 	movieProvider := flag.String("movie-provider", "", "Movie metadata provider (tmdb, omdb)")
 	tvProvider := flag.String("tv-provider", "", "TV show metadata provider (tvmaze, tvdb)")
@@ -491,47 +491,47 @@ func main() {
 	if *batchMode || *batchModeLong {
 		cfg.BatchMode = true
 	}
-	
+
 	if *recursiveMode || *recursiveModeLong {
 		cfg.Recursive = true
 	}
-	
+
 	if *lowerCase || *lowerCaseLong {
 		cfg.LowerCase = true
 	}
-	
+
 	if *sceneStyle || *sceneStyleLong {
 		cfg.SceneStyle = true
 	}
-	
+
 	if *separator != " " {
 		cfg.Separator = *separator
 	}
-	
+
 	if !*noOverwrite {
 		cfg.NoOverwrite = false
 	}
-	
+
 	if *previewMode {
 		cfg.PreviewMode = true
 	}
-	
+
 	if *noMetadata {
 		cfg.NoMetadata = true
 	}
-	
+
 	if *language != "en" {
 		cfg.Language = *language
 	}
-	
+
 	if *movieFormat != "" {
 		cfg.MovieFormat = *movieFormat
 	}
-	
+
 	if *tvFormat != "" {
 		cfg.TVFormat = *tvFormat
 	}
-	
+
 	// Apply provider selection from flags
 	if *movieProvider != "" {
 		switch *movieProvider {
@@ -543,7 +543,7 @@ func main() {
 			fmt.Printf("Warning: Unknown movie provider '%s', using default\n", *movieProvider)
 		}
 	}
-	
+
 	if *tvProvider != "" {
 		switch *tvProvider {
 		case "tvmaze":

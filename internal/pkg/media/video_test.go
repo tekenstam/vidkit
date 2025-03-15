@@ -109,9 +109,9 @@ func TestFormatBitRate(t *testing.T) {
 
 func TestFormatSize(t *testing.T) {
 	tests := []struct {
-		name    string
-		size    string
-		want    string
+		name string
+		size string
+		want string
 	}{
 		{
 			name: "Bytes",

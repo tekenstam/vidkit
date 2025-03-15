@@ -17,9 +17,9 @@ func TestExtractTVShowInfo(t *testing.T) {
 			name:     "Standard SxxExx format",
 			filename: "Breaking Bad S01E05 Gray Matter.mp4",
 			want: TVShowSearch{
-				Title:       "Breaking Bad",
-				Season:      1,
-				Episode:     5,
+				Title:        "Breaking Bad",
+				Season:       1,
+				Episode:      5,
 				EpisodeTitle: "Gray Matter",
 			},
 		},
@@ -124,7 +124,7 @@ func TestExtractTVShowInfo(t *testing.T) {
 func TestTvMazeProvider_SearchTVShow(t *testing.T) {
 	// Skip this test as we're working with external API that might not be reliably mocked
 	t.Skip("Skipping TvMaze API tests which require external access")
-	
+
 	// Create a mock server to simulate TvMaze API
 	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Handle different API endpoints
