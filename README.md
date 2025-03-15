@@ -2,7 +2,7 @@
 
 VidKit is an intelligent video file management system for media enthusiasts and collectors. This powerful Go-based CLI tool organizes your media library with metadata-driven intelligence - analyzing video files, fetching metadata from trusted sources, and intelligently renaming and organizing your content following configurable patterns.
 
-[![Release](https://img.shields.io/github/v/release/tekenstam/vidkit)](https://github.com/tekenstam/vidkit/releases/latest)
+[![Release](https://img.shields.io/github/v-release/tekenstam/vidkit)](https://github.com/tekenstam/vidkit/releases/latest)
 [![Go Version](https://img.shields.io/github/go-mod/go-version/tekenstam/vidkit)](https://golang.org/doc/devel/release.html)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Test and Lint](https://github.com/tekenstam/vidkit/actions/workflows/test.yml/badge.svg)](https://github.com/tekenstam/vidkit/actions/workflows/test.yml)
@@ -86,12 +86,12 @@ Process all videos in a directory (recursively):
 
 Preview changes without modifying files:
 ```bash
-./vidkit -preview <file_or_directory>
+./vidkit --preview <file_or_directory>
 ```
 
 Skip online metadata lookup:
 ```bash
-./vidkit -no-metadata <file_or_directory>
+./vidkit --no-metadata <file_or_directory>
 ```
 
 Available options:
@@ -100,19 +100,19 @@ Available options:
 -r             Search recursively in directories
 -l             Use lowercase characters in filenames
 -s             Use dots in place of spaces (scene style)
--preview       Preview mode: show what would be done without making changes
--no-metadata   Skip online metadata lookup
--no-overwrite  Prevent renaming if it would overwrite a file
--lang <code>   Metadata language (ISO 639-1 code, default: en)
--movie-format  Custom format for movie files
--tv-format     Custom format for TV show files
--separator     Character to use as separator in filenames
--movie-provider Select movie metadata provider (tmdb, omdb)
--tv-provider    Select TV show metadata provider (tvmaze, tvdb)
--organize      Enable/disable organizing files into directory structures (default: true)
--movie-dir     Directory template for movies (e.g., "Movies/{title[0]}/{title} ({year})")
--tv-dir        Directory template for TV shows (e.g., "TV/{title}/Season {season:02d}")
--version       Show version information
+--preview       Preview mode: show what would be done without making changes
+--no-metadata   Skip online metadata lookup
+--no-overwrite  Prevent renaming if it would overwrite a file
+--lang <code>   Metadata language (ISO 639-1 code, default: en)
+--movie-filename-template  Custom template for movie filenames (e.g., "{title} ({year}) [{resolution}]")
+--tv-filename-template     Custom template for TV show filenames (e.g., "{title} S{season:02d}E{episode:02d} {episode_title}")
+--separator     Character to use as separator in filenames
+--movie-provider Select movie metadata provider (tmdb, omdb)
+--tv-provider    Select TV show metadata provider (tvmaze, tvdb)
+--organize      Enable/disable organizing files into directory structures (default: true)
+--movie-directory-template     Directory template for movies (e.g., "Movies/{title[0]}/{title} ({year})")
+--tv-directory-template        Directory template for TV shows (e.g., "TV/{title}/Season {season:02d}")
+--version       Show version information
 ```
 
 ### Supported Video Formats
@@ -265,12 +265,12 @@ go run cmd/vidkit/main.go --preview --batch test_videos/*.mp4
 
 Test with custom TV show format:
 ```bash
-go run cmd/vidkit/main.go --preview --tv-format "{title}.S{season:02d}E{episode:02d}.{episode_title}" test_videos/Breaking.Bad.S01E05.Gray.Matter.mp4
+go run cmd/vidkit/main.go --preview --tv-filename-template "{title}.S{season:02d}E{episode:02d}.{episode_title}" test_videos/Breaking.Bad.S01E05.Gray.Matter.mp4
 ```
 
 Test with scene-style naming (dots instead of spaces):
 ```bash
-go run cmd/vidkit/main.go --preview --scene test_videos/Breaking.Bad.S01E05.Gray.Matter.mp4
+go run cmd/vidkit/main.go --preview --scene-style test_videos/Breaking.Bad.S01E05.Gray.Matter.mp4
 ```
 
 For more detailed testing information, see [CONTRIBUTING.md](CONTRIBUTING.md).

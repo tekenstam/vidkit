@@ -69,7 +69,7 @@ The script generates 38 small video files with various naming patterns:
    go run cmd/vidkit/main.go --preview test_videos/Breaking.Bad.1x01.mp4
    
    # Test with custom format string
-   go run cmd/vidkit/main.go --preview --tv-format "{title} - {season}x{episode} - {episode_title}" test_videos/*.mp4
+   go run cmd/vidkit/main.go --preview --tv-filename-template "{title} - {season}x{episode} - {episode_title}" test_videos/*.mp4
    ```
 
 3. Batch processing:

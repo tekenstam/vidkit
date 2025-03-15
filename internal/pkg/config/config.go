@@ -1,3 +1,10 @@
+// Package config provides configuration management for VidKit's application settings.
+// It handles loading and saving user configurations, API keys for metadata providers,
+// and operational settings that control VidKit's behavior.
+//
+// The configuration system supports multiple metadata providers for both movies and TV shows,
+// allowing users to select their preferred data source. The package manages API keys,
+// application preferences, and operational modes in a single configuration structure.
 package config
 
 import (
@@ -8,17 +15,19 @@ import (
 	"path/filepath"
 )
 
-// ProviderType defines supported metadata provider types
+// ProviderType defines supported metadata provider types.
+// These represent the available online services that can provide
+// metadata for movies and TV shows for VidKit's analysis.
 type ProviderType string
 
 const (
 	// Movie provider types
-	ProviderTMDb ProviderType = "tmdb"
-	ProviderOMDb ProviderType = "omdb"
+	ProviderTMDb ProviderType = "tmdb" // The Movie Database (primary movie provider)
+	ProviderOMDb ProviderType = "omdb" // Open Movie Database (alternative movie provider)
 
 	// TV show provider types
-	ProviderTVMaze ProviderType = "tvmaze"
-	ProviderTVDb   ProviderType = "tvdb"
+	ProviderTVMaze ProviderType = "tvmaze" // TVMaze (primary TV show provider)
+	ProviderTVDb   ProviderType = "tvdb"   // The TV Database (alternative TV show provider)
 )
 
 // Config holds application configuration settings for VidKit.
@@ -31,19 +40,19 @@ type Config struct {
 	TVDbAPIKey string `json:"tvdb_api_key"` // API key for The TV Database
 
 	// Operational modes
-	BatchMode bool `json:"batch_mode"` // Run without interactive prompts
-	Recursive bool `json:"recursive"` // Process directories recursively
+	BatchMode      bool     `json:"batch_mode"` // Run without interactive prompts
+	Recursive      bool     `json:"recursive"` // Process directories recursively
+	PreviewMode    bool     `json:"preview_mode"`
+	OnlyVideo      bool     `json:"only_video"`
 
 	// File handling preferences
-	Lowercase  bool `json:"lowercase"`  // Convert filenames to lowercase
-	SceneStyle bool `json:"scene_style"` // Use dots instead of spaces in filenames
-	Separator      string   `json:"separator"`
+	Lowercase  bool   `json:"lowercase"`  // Convert filenames to lowercase
+	SceneStyle bool   `json:"scene_style"` // Use dots instead of spaces in filenames
+	Separator  string `json:"separator"` // Character to use as separator in filenames
 	FileExtensions []string `json:"file_extensions"`
 	Language       string   `json:"language"` // Preferred language for metadata (ISO 639-1 code)
 	NoOverwrite    bool     `json:"no_overwrite"`
 	NoMetadata     bool     `json:"no_metadata"`
-	PreviewMode    bool     `json:"preview_mode"`
-	OnlyVideo      bool     `json:"only_video"`
 
 	// Provider preferences
 	MovieProvider ProviderType `json:"movie_provider"` // Preferred movie metadata provider
@@ -81,11 +90,13 @@ func LoadConfig() (*Config, error) {
 		NoMetadata:     false,
 		MovieProvider:  ProviderTMDb,
 		TVProvider:     ProviderTVMaze,
-		MovieFilenameTemplate: "{title} ({year}) [{resolution} {codec}]",
-		TVFilenameTemplate:    "{title} S{season:02d}E{episode:02d} {episode_title} [{resolution} {codec}]",
-		MovieDirectoryTemplate: "{genre}/{title} ({year})",
-		TVDirectoryTemplate:    "{genre}/{title}/Season {season}",
-		OrganizeFiles: false,
+		PreviewMode:    false,
+		OnlyVideo:      false,
+		MovieFilenameTemplate: "{title} ({year})",
+		TVFilenameTemplate:    "{title} S{season:02d}E{episode:02d} {episode_title}",
+		MovieDirectoryTemplate: "Movies/{title} ({year})",
+		TVDirectoryTemplate:    "TV/{title}/Season {season:02d}",
+		OrganizeFiles:  false,
 	}
 
 	// Check if config file exists
@@ -128,7 +139,7 @@ func ValidateConfig(cfg *Config) error {
 
 	// Apply default TV format if needed
 	if cfg.TVFilenameTemplate == "" {
-		cfg.TVFilenameTemplate = "{title} S{season:02d}E{episode:02d} {episode_title} [{resolution} {codec}]"
+		cfg.TVFilenameTemplate = "{title} - S{season:02d}E{episode:02d} - {episode_title}"
 	}
 
 	// Check if metadata is enabled but no API key is provided
