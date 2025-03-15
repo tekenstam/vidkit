@@ -63,6 +63,24 @@ jobs:
           # Test TV season organization
           ./vidkit --preview --tv-dir "test_organization/TV/{title}/Season {season:02d}" test_videos/Breaking.Bad.S01E01.Pilot.mp4 | tee output.log
           grep -q "test_organization/TV/Breaking Bad/Season 01" output.log || { echo "TV season organization failed"; exit 1; }
+          
+      - name: Test resolution detection
+        run: |
+          echo "Testing resolution detection..."
+          chmod +x ./tools/test_resolution.sh
+          ./tools/test_resolution.sh
+          
+      - name: Test error handling
+        run: |
+          echo "Testing error handling..."
+          chmod +x ./tools/test_error_handling.sh
+          ./tools/test_error_handling.sh
+          
+      - name: Test CLI functionality
+        run: |
+          echo "Testing command-line interface..."
+          chmod +x ./tools/test_cli.sh
+          ./tools/test_cli.sh
       
       - name: Archive test files on failure
         if: failure()
@@ -73,3 +91,4 @@ jobs:
             output.log
             test_videos/
             test_organization/
+            test_results/

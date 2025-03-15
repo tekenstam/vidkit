@@ -101,8 +101,23 @@ test-organization: build generate-test-videos
 	@echo "Testing directory organization features..."
 	./tools/test_directory_organization.sh
 
+# Test resolution detection
+test-resolution: build
+	@echo "=== Testing resolution and video quality detection ==="
+	./tools/test_resolution.sh
+
+# Test error handling
+test-error-handling: build
+	@echo "=== Testing error handling ==="
+	./tools/test_error_handling.sh
+
+# Test command-line interface
+test-cli: build
+	@echo "=== Testing command-line interface ==="
+	./tools/test_cli.sh
+
 # Run all tests
-test-all: test test-race generate-test-videos test-tv-formats test-custom-format test-organization
+test-all: test test-race generate-test-videos test-tv-formats test-custom-format test-organization test-resolution test-error-handling test-cli
 
 # Run code quality checks - both tests and linting
 quality: test lint
@@ -128,5 +143,8 @@ help:
 	@echo "  make test-tv-formats     - Test different TV show naming formats"
 	@echo "  make test-custom-format  - Test custom naming formats"
 	@echo "  make test-organization   - Test directory organization features"
+	@echo "  make test-resolution     - Test resolution and video quality detection"
+	@echo "  make test-error-handling - Test error handling capabilities"
+	@echo "  make test-cli            - Test command-line interface functionality"
 	@echo "  make test-all            - Run all tests including integration tests"
 	@echo "  make help                - Show this help message"
