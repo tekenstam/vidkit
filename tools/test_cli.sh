@@ -157,7 +157,7 @@ fi
 
 # Test 9: Scene style
 echo -e "\n--- Test 9: Scene style flag ---"
-./vidkit --preview --batch $NO_METADATA -s "$TEST_MOVIE" 2>&1 | tee output.log
+./vidkit --preview --batch $NO_METADATA --scene-style "$TEST_MOVIE" 2>&1 | tee output.log
 if grep -q "panic\|crash\|invalid scene" output.log; then
   report_test_result "Scene style flag" 1 "Scene style flag caused issues"
 else
