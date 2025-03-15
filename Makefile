@@ -103,6 +103,19 @@ test-organization: build generate-test-videos
 	@echo "Testing directory organization features..."
 	./tools/test_directory_organization.sh
 
+# Test directory organization in CI (no metadata)
+test-organization-ci: build
+	@echo "=== Testing directory organization in CI ==="
+	@echo "Creating test directory..."
+	mkdir -p test_organization
+	@echo "Testing basic movie organization..."
+	./$(BINARY_NAME) --preview --no-metadata --movie-dir "test_organization/Movies/{title} ({year})" test_videos/Inception.2010.1080p.BluRay.x264.mp4
+	@echo "Testing alphabetical movie organization..."
+	./$(BINARY_NAME) --preview --no-metadata --movie-dir "test_organization/Movies/{title[0]}/{title} ({year})" test_videos/Inception.2010.1080p.BluRay.x264.mp4
+	@echo "Testing TV season organization..."
+	./$(BINARY_NAME) --preview --no-metadata --tv-dir "test_organization/TV/{title}/Season {season:02d}" test_videos/Breaking.Bad.S01E01.Pilot.mp4
+	@echo "Directory organization tests completed successfully"
+
 # Test resolution detection
 test-resolution: build
 	@echo "=== Testing resolution and video quality detection ==="
@@ -145,6 +158,7 @@ help:
 	@echo "  make test-tv-formats     - Test different TV show naming formats"
 	@echo "  make test-custom-format  - Test custom naming formats"
 	@echo "  make test-organization   - Test directory organization features"
+	@echo "  make test-organization-ci - Test directory organization in CI"
 	@echo "  make test-resolution     - Test resolution and video quality detection"
 	@echo "  make test-error-handling - Test error handling capabilities"
 	@echo "  make test-cli            - Test command-line interface functionality"
