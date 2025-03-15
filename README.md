@@ -2,7 +2,7 @@
 
 VidKit is an intelligent video file management system for media enthusiasts and collectors. This powerful Go-based CLI tool organizes your media library with metadata-driven intelligence - analyzing video files, fetching metadata from trusted sources, and intelligently renaming and organizing your content following configurable patterns.
 
-[![Release](https://img.shields.io/github/v-release/tekenstam/vidkit)](https://github.com/tekenstam/vidkit/releases/latest)
+[![Release](https://img.shields.io/github/v/release/tekenstam/vidkit)](https://github.com/tekenstam/vidkit/releases/latest)
 [![Go Version](https://img.shields.io/github/go-mod/go-version/tekenstam/vidkit)](https://golang.org/doc/devel/release.html)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Test and Lint](https://github.com/tekenstam/vidkit/actions/workflows/test.yml/badge.svg)](https://github.com/tekenstam/vidkit/actions/workflows/test.yml)
@@ -84,15 +84,7 @@ sudo mv vidkit /usr/local/bin/  # Optional: move to a directory in your PATH
 
 ### Option 2: Build from Source
 
-For developers working on VidKit or users who prefer to build from the latest source:
-
-```bash
-git clone https://github.com/tekenstam/vidkit.git
-cd vidkit
-go build -o vidkit ./cmd/vidkit
-```
-
-See the [Installation](#installation) section for simpler options using pre-built binaries.
+If you prefer to build from source, see the [Building From Source](#building-from-source) section under Development.
 
 ### API Key Setup (for metadata features)
 
@@ -227,6 +219,18 @@ Do you want to rename the file? (y/N):
 ## Development
 
 VidKit is built with Go and follows standard Go project practices.
+
+### Building From Source
+
+For developers working on VidKit or users who prefer to build from the latest source:
+
+```bash
+git clone https://github.com/tekenstam/vidkit.git
+cd vidkit
+go build -o vidkit ./cmd/vidkit
+```
+
+For regular users, pre-built binaries are the recommended option. See the [Installation](#installation) section.
 
 ### Code Quality
 
