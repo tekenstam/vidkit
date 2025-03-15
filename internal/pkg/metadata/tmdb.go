@@ -24,9 +24,15 @@ type MovieMetadata struct {
 	Overview string
 }
 
+// TMDbClient defines the interface for TMDb operations
+type TMDbClient interface {
+	GetSearchMovies(query string, urlOptions map[string]string) (*tmdb.SearchMovies, error)
+	GetMovieDetails(id int, urlOptions map[string]string) (*tmdb.MovieDetails, error)
+}
+
 // TMDbProvider implements movie metadata lookup using TMDb
 type TMDbProvider struct {
-	client *tmdb.Client
+	client TMDbClient
 }
 
 // NewTMDbProvider creates a new TMDb metadata provider
@@ -97,16 +103,29 @@ func ExtractMovieInfo(filename string) MovieSearch {
 	basename := strings.TrimSuffix(filepath.Base(filename), filepath.Ext(filename))
 	
 	// Look for year pattern (YYYY) in filename
-	yearPattern := regexp.MustCompile(`\((\d{4})\)`)
+	yearPattern := regexp.MustCompile(`\((\d{4})\)|\[(\d{4})\]|\.(\d{4})\.`)
 	year := 0
 	title := basename
 
-	if matches := yearPattern.FindStringSubmatch(basename); len(matches) > 1 {
-		if y, err := strconv.Atoi(matches[1]); err == nil {
-			year = y
-			// Remove the year from the title
-			title = strings.TrimSpace(yearPattern.ReplaceAllString(basename, ""))
+	// Try all possible year patterns
+	for _, matches := range yearPattern.FindAllStringSubmatch(basename, -1) {
+		for i := 1; i < len(matches); i++ {
+			if matches[i] != "" {
+				if y, err := strconv.Atoi(matches[i]); err == nil {
+					year = y
+					// Use the first valid year found
+					break
+				}
+			}
 		}
+		if year != 0 {
+			break
+		}
+	}
+
+	// Remove year and common patterns
+	if year > 0 {
+		title = yearPattern.ReplaceAllString(basename, " ")
 	}
 
 	// Clean up the title by removing common patterns
@@ -117,14 +136,23 @@ func ExtractMovieInfo(filename string) MovieSearch {
 		"360p", "",
 		"h264", "",
 		"x264", "",
-		"[", "",
-		"]", "",
-		"(", "",
-		")", "",
+		"HDRip", "",
+		"BRRip", "",
+		"BluRay", "",
+		"WEB-DL", "",
+		"[", " ",
+		"]", " ",
+		"(", " ",
+		")", " ",
+		".", " ",
+		"_", " ",
 	).Replace(title)
 	
+	// Clean up extra spaces
+	title = regexp.MustCompile(`\s+`).ReplaceAllString(strings.TrimSpace(title), " ")
+
 	return MovieSearch{
-		Title: strings.TrimSpace(title),
+		Title: title,
 		Year:  year,
 	}
 }
