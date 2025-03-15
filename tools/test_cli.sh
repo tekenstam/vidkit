@@ -41,7 +41,7 @@ echo "Using test video: $TEST_MOVIE"
 # Test 1: Help flag
 echo -e "\n--- Test 1: Help flag ---"
 ./vidkit --help | tee output.log
-if ! grep -q "Usage\|vidkit" output.log; then
+if ! grep -q "Usage of ./vidkit" output.log; then
   echo "❌ Failed: Help information not displayed properly"
   exit 1
 else
@@ -51,7 +51,7 @@ fi
 # Test 2: Version flag
 echo -e "\n--- Test 2: Version flag ---"
 ./vidkit --version | tee output.log
-if ! grep -q "VidKit\|version" output.log; then
+if ! grep -q "VidKit version" output.log; then
   echo "❌ Failed: Version information not displayed properly"
   exit 1
 else
