@@ -8,11 +8,21 @@ A powerful command-line toolkit for video file analysis, organization, and metad
   - File metadata (format, size, duration)
   - Video stream details (codec, resolution, bitrate, frame rate)
   - Audio stream details (codec, sample rate, channels, bitrate)
+- Multiple metadata provider options:
+  - Movies: TMDb (default) or OMDb
+  - TV Shows: TvMaze (default) or TVDb
+  - Command-line provider selection
+  - Configurable API keys
 - Online movie metadata lookup:
-  - Automatic movie identification using TMDb
+  - Automatic movie identification using filename
   - Smart title and year extraction from filenames
   - Movie overview and details
   - Configurable API key
+- TV show metadata lookup:
+  - Automatic TV show identification using filenames
+  - Smart extraction of series name, season and episode from filenames
+  - TV show overview and episode details
+  - Support for various episode naming conventions
 - Batch processing:
   - Process single files or entire directories
   - Recursive directory scanning
@@ -74,8 +84,20 @@ Skip online metadata lookup:
 
 Available options:
 ```
--preview      Preview mode: show what would be done without making changes
--no-metadata  Skip online metadata lookup
+-b             Batch mode: process automatically without interactive prompts
+-r             Search recursively in directories
+-l             Use lowercase characters in filenames
+-s             Use dots in place of spaces (scene style)
+-preview       Preview mode: show what would be done without making changes
+-no-metadata   Skip online metadata lookup
+-no-overwrite  Prevent renaming if it would overwrite a file
+-lang <code>   Metadata language (ISO 639-1 code, default: en)
+-movie-format  Custom format for movie files
+-tv-format     Custom format for TV show files
+-separator     Character to use as separator in filenames
+-movie-provider Select movie metadata provider (tmdb, omdb)
+-tv-provider    Select TV show metadata provider (tvmaze, tvdb)
+-version       Show version information
 ```
 
 ### Supported Video Formats

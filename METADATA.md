@@ -1,12 +1,23 @@
 # Metadata Integration for VidKit
 
-VidKit supports multiple metadata sources to provide rich information for your video files. This document explains how to set up and use each metadata provider.
+VidKit now supports multiple metadata providers for both movies and TV shows, giving you flexibility in how you obtain information about your video files. This document explains how to set up and use each metadata provider.
 
-## TMDb (The Movie Database)
+## Supported Providers
 
-TMDb is used for retrieving movie metadata, including title, year, and overview.
+| Provider | Type           | API Key Required | Default Status | Command Line Flag   |
+|----------|----------------|------------------|----------------|---------------------|
+| TMDb     | Movies         | Yes              | Default        | `--movie-provider tmdb` |
+| OMDb     | Movies         | Yes              | Optional       | `--movie-provider omdb` |
+| TvMaze   | TV Shows       | No               | Default        | `--tv-provider tvmaze` |
+| TVDb     | TV Shows       | Yes              | Optional       | `--tv-provider tvdb` |
 
-### 1. Get a TMDb API Key
+## 1. Movie Metadata Providers
+
+### TMDb (The Movie Database)
+
+TMDb is the default provider for movie metadata, offering comprehensive information about films.
+
+#### TMDb Setup
 
 1. Visit [The Movie Database](https://www.themoviedb.org/)
 2. Create an account or sign in
@@ -19,7 +30,7 @@ TMDb is used for retrieving movie metadata, including title, year, and overview.
    - Application Summary: Personal media file organization tool
    - Use case: Personal use for organizing media files
 
-### 2. Configure TMDb in VidKit
+#### TMDb Configuration
 
 1. Copy the example configuration:
    ```bash
@@ -34,50 +45,147 @@ TMDb is used for retrieving movie metadata, including title, year, and overview.
 3. Add your API key to the configuration:
    ```json
    {
-     "tmdb_api_key": "YOUR_API_KEY_HERE"
+     "tmdb_api_key": "YOUR_API_KEY_HERE",
+     "movie_provider": "tmdb"
    }
    ```
 
-### 3. TMDb-specific Options
+### OMDb (Open Movie Database)
 
-- `tmdb_api_key`: Your TMDb API key
-- `movie_format`: Template for movie filenames
-  - `{title}`: Movie title
-  - `{year}`: Release year
-  - `{resolution}`: Video resolution (e.g., "1080p")
-  - `{codec}`: Video codec (e.g., "h264")
+OMDb provides access to a large collection of movie information and can be used as an alternative to TMDb.
 
-## TvMaze
+#### OMDb Setup
 
-TvMaze is used for retrieving TV show metadata, including show information and episode details.
+1. Visit [OMDb API](https://www.omdbapi.com/apikey.aspx)
+2. Select the Free tier (1,000 daily requests limit) or pay for a higher tier
+3. Fill out the form and submit
+4. You'll receive an email with a verification link
+5. Click the verification link to activate your API key
 
-### 1. TvMaze API
+#### OMDb Configuration
 
-The great news about TvMaze is that it provides a free API that doesn't require an API key for basic usage. VidKit is configured to use the public TvMaze API by default, which provides:
+1. Edit your configuration file:
+   ```bash
+   nano ~/.config/vidkit/config.json
+   ```
+
+2. Add your OMDb API key:
+   ```json
+   {
+     "omdb_api_key": "YOUR_OMDB_KEY_HERE",
+     "movie_provider": "omdb"
+   }
+   ```
+
+#### Using OMDb from Command Line
+
+```bash
+vidkit --movie-provider omdb movie.mp4
+```
+
+## 2. TV Show Metadata Providers
+
+### TvMaze
+
+TvMaze is the default provider for TV show metadata and doesn't require an API key for basic usage.
+
+#### TvMaze Features
 
 - TV show information (title, year, network, status, genres)
 - Season and episode information
 - Episode titles and air dates
 - Show overviews and descriptions
 
-### 2. TvMaze-specific Options
+#### TvMaze Configuration
 
-- `tv_format`: Template for TV episode filenames
-  - `{title}`: TV show title
-  - `{year}`: Show premiere year
-  - `{season}`: Season number
-  - `{season:02d}`: Season number with leading zero (01 instead of 1)
-  - `{episode}`: Episode number
-  - `{episode:02d}`: Episode number with leading zero (01 instead of 1)
-  - `{episode_title}`: Episode title
-  - `{resolution}`: Video resolution (e.g., "1080p")
-  - `{codec}`: Video codec (e.g., "h264")
-  
-### 3. Rate Limiting
+No configuration is required for TvMaze as it's free to use without an API key.
 
-TvMaze has rate limits on its API:
-- 20 calls every 10 seconds per IP address
-- Please be respectful of these limits when processing large batches
+### TVDb (The TV Database)
+
+TVDb provides comprehensive TV show information but requires an API key.
+
+#### TVDb Setup
+
+1. Visit [TheTVDB.com](https://thetvdb.com/)
+2. Create an account
+3. Go to your account dashboard
+4. Navigate to the API section
+5. Register for an API key (follow their instructions)
+
+#### TVDb Configuration
+
+1. Edit your configuration file:
+   ```bash
+   nano ~/.config/vidkit/config.json
+   ```
+
+2. Add your TVDb API key:
+   ```json
+   {
+     "tvdb_api_key": "YOUR_TVDB_KEY_HERE",
+     "tv_provider": "tvdb"
+   }
+   ```
+
+#### Using TVDb from Command Line
+
+```bash
+vidkit --tv-provider tvdb tvshow.mp4
+```
+
+## Configuration Options
+
+You can set your preferred providers in the config file:
+
+```json
+{
+  "tmdb_api_key": "your_tmdb_api_key",
+  "omdb_api_key": "your_omdb_api_key",
+  "tvdb_api_key": "your_tvdb_api_key",
+  "movie_provider": "tmdb",  // "tmdb" or "omdb"
+  "tv_provider": "tvmaze"    // "tvmaze" or "tvdb"
+}
+```
+
+## Using Multiple Providers
+
+VidKit allows you to switch between providers without changing your configuration:
+
+```bash
+# Use TMDb for movie lookup
+vidkit --movie-provider tmdb movie.mp4
+
+# Use OMDb for movie lookup
+vidkit --movie-provider omdb movie.mp4
+
+# Use TvMaze for TV show lookup
+vidkit --tv-provider tvmaze tvshow.mp4
+
+# Use TVDb for TV show lookup
+vidkit --tv-provider tvdb tvshow.mp4
+```
+
+## Provider Comparison
+
+### Movie Providers
+
+| Feature          | TMDb                 | OMDb                |
+|------------------|----------------------|---------------------|
+| Movie Data       | Comprehensive        | Good                |
+| Update Frequency | Very frequent        | Regular             |
+| API Limitations  | 40 requests/10s      | 1,000/day (free)    |
+| Language Support | Multiple languages   | Limited             |
+| Data Richness    | Very detailed        | Good                |
+
+### TV Show Providers
+
+| Feature          | TvMaze               | TVDb                |
+|------------------|----------------------|---------------------|
+| API Key Required | No                   | Yes                 |
+| Update Frequency | Regular              | Very frequent       |
+| API Limitations  | 20 calls/10s per IP  | Varies by account   |
+| Community Data   | Moderate             | Very active         |
+| Data Richness    | Good                 | Very detailed       |
 
 ## Filename Format Guidelines
 
@@ -147,65 +255,18 @@ Options:
   --tv-format      TV episode filename format template
   --preview        show what would be done without making changes
   --no-metadata    skip online metadata lookup
+  --movie-provider select movie metadata provider (tmdb, omdb)
+  --tv-provider    select TV show metadata provider (tvmaze, tvdb)
 ```
-
-## Examples
-
-### Movie Examples
-
-1. Standard naming (with spaces):
-   ```bash
-   vidkit "movie.mp4"
-   # Result: "Movie Title (2023) [1080p h264].mp4"
-   ```
-
-2. Scene-style naming (with dots):
-   ```bash
-   vidkit -s "movie.mp4"
-   # Result: "Movie.Title.(2023).[1080p.h264].mp4"
-   ```
-
-3. Custom separator (underscore):
-   ```bash
-   vidkit --separator "_" "movie.mp4"
-   # Result: "Movie_Title_(2023)_[1080p_h264].mp4"
-   ```
-
-### TV Show Examples
-
-1. Standard TV show format:
-   ```bash
-   vidkit "Show.S01E01.mp4"
-   # Result: "Show S01E01 Episode Title [1080p h264].mp4"
-   ```
-
-2. Custom TV format:
-   ```bash
-   vidkit --tv-format "{title} - S{season:02d}E{episode:02d} - {episode_title}" "Show.S01E01.mp4"
-   # Result: "Show - S01E01 - Episode Title.mp4"
-   ```
-
-3. Scene-style TV show format:
-   ```bash
-   vidkit -s "Show.S01E01.mp4"
-   # Result: "Show.S01E01.Episode.Title.[1080p.h264].mp4"
-   ```
 
 ## Troubleshooting
 
-1. **API Key Invalid**: Ensure your TMDb API key is correctly entered in the config file.
+1. **API Key Invalid**: Ensure your API keys are correctly entered in the config file.
 
-2. **Not Finding TV Shows**: Try different search formats. TvMaze works best with clean show titles.
+2. **Not Finding TV Shows/Movies**: Try different search formats or use a different provider.
 
 3. **Rate Limiting**: If you see errors about too many requests, slow down batch processing.
 
 4. **Language Issues**: Check that the language code specified is supported by the metadata provider.
 
-5. **Metadata Not Found**: For obscure titles, you might need to manually specify more information.
-
-## Metadata Provider Status
-
-| Provider | Type           | API Key Required | Default Status |
-|----------|----------------|------------------|----------------|
-| TMDb     | Movies         | Yes              | Enabled        |
-| TvMaze   | TV Shows       | No               | Enabled        |
+5. **Provider Selection**: If you get errors about missing API keys, ensure you have configured the appropriate key for your selected provider.

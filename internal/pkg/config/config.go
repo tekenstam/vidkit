@@ -8,10 +8,25 @@ import (
 	"path/filepath"
 )
 
+// ProviderType defines supported metadata provider types
+type ProviderType string
+
+const (
+	// Movie provider types
+	ProviderTMDb  ProviderType = "tmdb"
+	ProviderOMDb  ProviderType = "omdb"
+	
+	// TV show provider types
+	ProviderTVMaze ProviderType = "tvmaze"
+	ProviderTVDb   ProviderType = "tvdb"
+)
+
 // Config holds application configuration
 type Config struct {
 	// Common options
 	TMDbAPIKey     string `json:"tmdb_api_key"`
+	OMDbAPIKey     string `json:"omdb_api_key"`
+	TVDbAPIKey     string `json:"tvdb_api_key"`
 	BatchMode      bool   `json:"batch_mode"`
 	Recursive      bool   `json:"recursive"`
 	LowerCase      bool   `json:"lowercase"`
@@ -23,6 +38,10 @@ type Config struct {
 	NoMetadata     bool   `json:"no_metadata"`
 	PreviewMode    bool   `json:"preview_mode"`
 	EnableMetadata bool   `json:"enable_metadata"`
+	
+	// Provider selection
+	MovieProvider ProviderType `json:"movie_provider"`
+	TVProvider    ProviderType `json:"tv_provider"`
 
 	// Formatting options
 	MovieFormat string `json:"movie_format"`
@@ -40,6 +59,8 @@ func LoadConfig() (*Config, error) {
 	// Create default config
 	cfg := &Config{
 		TMDbAPIKey:     "",
+		OMDbAPIKey:     "",
+		TVDbAPIKey:     "",
 		BatchMode:      false,
 		Recursive:      false,
 		LowerCase:      false,
@@ -49,74 +70,75 @@ func LoadConfig() (*Config, error) {
 		Language:       "en",
 		NoOverwrite:    false,
 		NoMetadata:     false,
-		PreviewMode:    false,
-		EnableMetadata: true,
+		MovieProvider:  ProviderTMDb,
+		TVProvider:     ProviderTVMaze,
 		MovieFormat:    "{title} ({year}) [{resolution} {codec}]",
 		TVFormat:       "{title} S{season:02d}E{episode:02d} {episode_title} [{resolution} {codec}]",
+		EnableMetadata: true,
 	}
 
-	// Try to read config file
+	// Check if config file exists
 	configPath := ConfigFilePath()
-	data, err := os.ReadFile(configPath)
-	
-	// If file doesn't exist, create default config
-	if errors.Is(err, os.ErrNotExist) {
-		// Ensure directory exists
-		err = os.MkdirAll(filepath.Dir(configPath), 0755)
-		if err != nil {
-			return cfg, err
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+		// Create directory structure
+		configDir := filepath.Dir(configPath)
+		if err := os.MkdirAll(configDir, 0755); err != nil {
+			return nil, err
 		}
-		
-		// Write default config
-		data, err := json.MarshalIndent(cfg, "", "  ")
-		if err != nil {
-			return cfg, err
+
+		// Save default config
+		defaultConfig := DefaultConfig()
+		if err := SaveConfig(defaultConfig); err != nil {
+			return nil, err
 		}
-		
-		err = os.WriteFile(configPath, data, 0644)
-		if err != nil {
-			return cfg, err
-		}
-		
-		return cfg, nil
+		return defaultConfig, nil
 	}
-	
-	// If other error occurred while reading
+
+	// Read config file
+	configData, err := os.ReadFile(configPath)
 	if err != nil {
-		return cfg, err
+		return nil, err
 	}
-	
-	// Parse config file
-	err = json.Unmarshal(data, cfg)
-	if err != nil {
-		return cfg, err
+
+	// Parse config JSON
+	if err := json.Unmarshal(configData, cfg); err != nil {
+		return nil, err
 	}
-	
+
 	return cfg, nil
 }
 
 // ValidateConfig validates the configuration
 func ValidateConfig(cfg *Config) error {
-	if cfg.Separator == "" {
-		cfg.Separator = " "
+	// Check if metadata is enabled but no API key is provided
+	if !cfg.NoMetadata && cfg.EnableMetadata {
+		// Check based on selected providers
+		if cfg.MovieProvider == ProviderTMDb && cfg.TMDbAPIKey == "" {
+			return errors.New("TMDb API key is required for metadata lookup (set tmdb_api_key in config.json)")
+		}
+		if cfg.MovieProvider == ProviderOMDb && cfg.OMDbAPIKey == "" {
+			return errors.New("OMDb API key is required for metadata lookup (set omdb_api_key in config.json)")
+		}
+		if cfg.TVProvider == ProviderTVDb && cfg.TVDbAPIKey == "" {
+			return errors.New("TVDb API key is required for metadata lookup (set tvdb_api_key in config.json)")
+		}
 	}
-	
-	if cfg.SceneStyle {
+
+	// Validate movie format template
+	if cfg.MovieFormat == "" {
+		return errors.New("movie format template cannot be empty")
+	}
+
+	// Validate TV format template
+	if cfg.TVFormat == "" {
+		return errors.New("TV format template cannot be empty")
+	}
+
+	// Apply scene style settings
+	if cfg.SceneStyle && cfg.Separator == " " {
 		cfg.Separator = "."
 	}
-	
-	if cfg.Language == "" {
-		cfg.Language = "en"
-	}
-	
-	if cfg.MovieFormat == "" {
-		cfg.MovieFormat = "{title} ({year}) [{resolution} {codec}]"
-	}
-	
-	if cfg.TVFormat == "" {
-		cfg.TVFormat = "{title} S{season:02d}E{episode:02d} {episode_title} [{resolution} {codec}]"
-	}
-	
+
 	return nil
 }
 
@@ -124,19 +146,21 @@ func ValidateConfig(cfg *Config) error {
 func SaveConfig(config *Config) error {
 	configPath := ConfigFilePath()
 	
-	// Ensure directory exists
-	if err := os.MkdirAll(filepath.Dir(configPath), 0755); err != nil {
-		return fmt.Errorf("failed to create config directory: %v", err)
+	// Create directory if it doesn't exist
+	configDir := filepath.Dir(configPath)
+	if err := os.MkdirAll(configDir, 0755); err != nil {
+		return fmt.Errorf("error creating config directory: %v", err)
 	}
 	
-	// Write config
+	// Marshal config to JSON
 	data, err := json.MarshalIndent(config, "", "  ")
 	if err != nil {
-		return fmt.Errorf("failed to marshal config: %v", err)
+		return fmt.Errorf("error marshaling config: %v", err)
 	}
 	
+	// Write config to file
 	if err := os.WriteFile(configPath, data, 0644); err != nil {
-		return fmt.Errorf("failed to write config: %v", err)
+		return fmt.Errorf("error writing config file: %v", err)
 	}
 	
 	return nil
@@ -150,13 +174,22 @@ func SetConfigPath(fn func() string) {
 // DefaultConfig returns a configuration with default values
 func DefaultConfig() *Config {
 	return &Config{
-		Language: "en",
-		MovieFormat: "{title} ({year}) [{resolution} {codec}]",
-		TVFormat: "{title} S{season:02d}E{episode:02d} {episode_title} [{resolution} {codec}]",
-		FileExtensions: []string{
-			".mp4", ".mkv", ".avi", ".mov", ".wmv",
-			".flv", ".webm", ".m4v", ".mpg", ".mpeg", ".3gp",
-		},
-		Separator: " ", // Default to spaces
+		TMDbAPIKey:     "",
+		OMDbAPIKey:     "",
+		TVDbAPIKey:     "",
+		BatchMode:      false,
+		Recursive:      false,
+		LowerCase:      false,
+		SceneStyle:     false,
+		Separator:      " ",
+		FileExtensions: []string{".mp4", ".mkv", ".avi", ".mov", ".wmv", ".m4v", ".mpg", ".mpeg"},
+		Language:       "en",
+		NoOverwrite:    true,
+		NoMetadata:     false,
+		MovieProvider:  ProviderTMDb,
+		TVProvider:     ProviderTVMaze,
+		MovieFormat:    "{title} ({year}) [{resolution} {codec}]",
+		TVFormat:       "{title} S{season:02d}E{episode:02d} {episode_title} [{resolution} {codec}]",
+		EnableMetadata: true,
 	}
 }
