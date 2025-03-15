@@ -9,7 +9,7 @@ VidKit is an intelligent video file management system for media enthusiasts and 
 [![Integration Tests](https://github.com/tekenstam/vidkit/actions/workflows/integration.yml/badge.svg)](https://github.com/tekenstam/vidkit/actions/workflows/integration.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/tekenstam/vidkit)](https://goreportcard.com/report/github.com/tekenstam/vidkit)
 [![Maintained](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/tekenstam/vidkit/commits/main)
-[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=tekenstam/vidkit)](https://dependabot.com)
+[![Dependabot](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg)](https://github.com/tekenstam/vidkit/blob/main/.github/dependabot.yml)
 
 ## Overview
 
