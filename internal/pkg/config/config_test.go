@@ -93,11 +93,12 @@ func TestLoadAndSaveConfig(t *testing.T) {
 	}
 
 	// Set up a temporary config path
-	oldConfigPath := getConfigPath
-	defer func() { getConfigPath = oldConfigPath }()
-	getConfigPath = func() string {
-		return filepath.Join(tmpDir, "config.json")
-	}
+	configPath := filepath.Join(tmpDir, "config.json")
+	originalPath := getConfigPath
+	SetConfigPath(func() string {
+		return configPath
+	})
+	defer SetConfigPath(originalPath)
 
 	// Test saving config
 	if err := SaveConfig(testConfig); err != nil {
@@ -116,7 +117,7 @@ func TestLoadAndSaveConfig(t *testing.T) {
 	}
 
 	// Test loading with missing file (should create default)
-	os.Remove(getConfigPath())
+	os.Remove(configPath)
 	defaultConfig, err := LoadConfig()
 	if err != nil {
 		t.Fatalf("LoadConfig() with missing file error = %v", err)
@@ -137,11 +138,12 @@ func TestConfigPermissions(t *testing.T) {
 	defer os.RemoveAll(tmpDir)
 
 	// Set up a temporary config path
-	oldConfigPath := getConfigPath
-	defer func() { getConfigPath = oldConfigPath }()
-	getConfigPath = func() string {
-		return filepath.Join(tmpDir, "config.json")
-	}
+	configPath := filepath.Join(tmpDir, "config.json")
+	originalPath := getConfigPath
+	SetConfigPath(func() string {
+		return configPath
+	})
+	defer SetConfigPath(originalPath)
 
 	// Create a test config
 	testConfig := DefaultConfig()
@@ -153,7 +155,7 @@ func TestConfigPermissions(t *testing.T) {
 	}
 
 	// Check file permissions
-	info, err := os.Stat(getConfigPath())
+	info, err := os.Stat(configPath)
 	if err != nil {
 		t.Fatalf("Failed to stat config file: %v", err)
 	}

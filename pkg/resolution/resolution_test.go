@@ -21,11 +21,15 @@ func TestGetStandardResolution(t *testing.T) {
 		{"Exact 360p", 640, 360, "360p"},
 		{"Near 1080p", 1920, 1082, "1080p"},  // Within tolerance
 		{"Near 720p", 1280, 715, "720p"},      // Within tolerance
+		{"Near 1080p Low", 1920, 1075, "1080p"}, // Within tolerance
 		{"Custom Resolution", 1600, 900, "900p"},
 		{"Very Low Resolution", 320, 240, "240p"},
 		{"Wide 1080p", 2560, 1080, "1080p"},
-		{"Custom High Resolution", 3000, 2000, "~2K"},
+		{"Custom High Resolution", 3000, 2000, "2000p"}, // Non-standard resolution
 		{"Zero dimensions", 0, 0, "0p"},
+		{"Ultrawide 1440p", 3440, 1440, "1440p"},
+		{"Near 4K", 3840, 2150, "4K"},
+		{"Near 4K High", 3840, 2170, "4K"},
 	}
 
 	for _, tt := range tests {
@@ -50,6 +54,8 @@ func TestAbs(t *testing.T) {
 		{"Zero", 0, 0},
 		{"Large positive", 1000, 1000},
 		{"Large negative", -1000, 1000},
+		{"Max int", int(^uint(0) >> 1), int(^uint(0) >> 1)},
+		{"Min int + 1", -(int(^uint(0)>>1) - 1), int(^uint(0)>>1) - 1},
 	}
 
 	for _, tt := range tests {

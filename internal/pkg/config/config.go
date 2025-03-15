@@ -25,6 +25,26 @@ type Config struct {
 	Separator       string   `json:"separator"`
 }
 
+// ConfigPathFunc is a function type for getting config path
+type ConfigPathFunc func() string
+
+// getConfigPath returns the path to the configuration file
+var getConfigPath ConfigPathFunc = defaultConfigPath
+
+// defaultConfigPath returns the default path to the configuration file
+func defaultConfigPath() string {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return ".vidkit.json"
+	}
+	return filepath.Join(homeDir, ".config", "vidkit", "config.json")
+}
+
+// SetConfigPath allows setting a custom config path function (for testing)
+func SetConfigPath(fn ConfigPathFunc) {
+	getConfigPath = fn
+}
+
 // DefaultConfig returns a configuration with default values
 func DefaultConfig() *Config {
 	return &Config{
@@ -106,13 +126,4 @@ func ValidateConfig(config *Config) error {
 		return fmt.Errorf("TMDb API key is required for metadata lookup")
 	}
 	return nil
-}
-
-// getConfigPath returns the path to the configuration file
-func getConfigPath() string {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return ".vidkit.json"
-	}
-	return filepath.Join(homeDir, ".config", "vidkit", "config.json")
 }
