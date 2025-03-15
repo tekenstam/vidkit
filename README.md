@@ -131,23 +131,23 @@ vidkit --no-metadata <file_or_directory>
 
 Available options:
 ```
--b             Batch mode: process automatically without interactive prompts
--r             Search recursively in directories
--l             Use lowercase characters in filenames
--s             Use dots in place of spaces (scene style)
---preview       Preview mode: show what would be done without making changes
---no-metadata   Skip online metadata lookup
---no-overwrite  Prevent renaming if it would overwrite a file
---lang <code>   Metadata language (ISO 639-1 code, default: en)
---movie-filename-template  Custom template for movie filenames (e.g., "{title} ({year}) [{resolution}]")
---tv-filename-template     Custom template for TV show filenames (e.g., "{title} S{season:02d}E{episode:02d} {episode_title}")
---separator     Character to use as separator in filenames
---movie-provider Select movie metadata provider (tmdb, omdb)
---tv-provider    Select TV show metadata provider (tvmaze, tvdb)
---organize      Enable/disable organizing files into directory structures (default: true)
---movie-directory-template     Directory template for movies (e.g., "Movies/{title[0]}/{title} ({year})")
---tv-directory-template        Directory template for TV shows (e.g., "TV/{title}/Season {season:02d}")
---version       Show version information
+  -batch               Process files without prompting
+  -recursive           Process directories recursively
+  -lowercase           Convert filenames to lowercase
+  -scene-style         Use dots instead of spaces (scene style)
+  -separator string    Character to use as separator in filenames
+  -preview             Preview mode: show what would be done without making changes
+  -no-metadata         Skip metadata lookup
+  -no-overwrite        Don't overwrite existing files
+  -organize            Organize files into directories
+  -lang string         Metadata language (ISO 639-1 code, default: en)
+  -movie-filename-template string    Template for movie filenames (e.g., '{title} ({year}) [{resolution}]')
+  -tv-filename-template string       Template for TV show filenames (e.g., '{title} S{season:02d}E{episode:02d} {episode_title}')
+  -movie-directory-template string   Template for movie directory organization (e.g., 'Movies/{genre}/{title} ({year})')
+  -tv-directory-template string      Template for TV show directory organization (e.g., 'TV/{genre}/{title}/Season {season:02d}')
+  -movie-provider string    Select movie metadata provider (tmdb, omdb)
+  -tv-provider string       Select TV show metadata provider (tvmaze, tvdb)
+  -version                  Show version information
 ```
 
 ### Supported Video Formats
