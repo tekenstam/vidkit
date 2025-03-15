@@ -30,7 +30,7 @@ archives:
     files:
       - README.md
       - LICENSE
-      - TMDB_SETUP.md
+      - METADATA.md
       - .config.example.json
 
 checksum:
