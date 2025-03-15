@@ -2,8 +2,13 @@
 
 VidKit is an intelligent video file management system for media enthusiasts and collectors. This powerful Go-based CLI tool organizes your media library with metadata-driven intelligence - analyzing video files, fetching metadata from trusted sources, and intelligently renaming and organizing your content following configurable patterns.
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/tekenstam/vidkit)](https://goreportcard.com/report/github.com/tekenstam/vidkit)
+[![Release](https://img.shields.io/github/v/release/tekenstam/vidkit)](https://github.com/tekenstam/vidkit/releases/latest)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/tekenstam/vidkit)](https://golang.org/doc/devel/release.html)
 [![License](https://img.shields.io/github/license/tekenstam/vidkit)](LICENSE)
+[![Tests](https://github.com/tekenstam/vidkit/workflows/Test/badge.svg)](https://github.com/tekenstam/vidkit/actions?query=workflow%3ATest)
+[![Integration Tests](https://github.com/tekenstam/vidkit/workflows/Integration%20Tests/badge.svg)](https://github.com/tekenstam/vidkit/actions?query=workflow%3A%22Integration+Tests%22)
+[![Go Report Card](https://goreportcard.com/badge/github.com/tekenstam/vidkit)](https://goreportcard.com/report/github.com/tekenstam/vidkit)
+[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=tekenstam/vidkit)](https://dependabot.com)
 
 ## Overview
 
