@@ -151,3 +151,70 @@ Do you want to rename the file? (y/N):
 - 2K (2048x1080)
 - 4K (3840x2160)
 - 8K (7680x4320)
+
+## Testing
+
+VidKit includes various tests for ensuring proper functionality.
+
+### Running Tests
+
+Run the full test suite:
+```bash
+go test ./...
+```
+
+Run tests with verbose output:
+```bash
+go test -v ./...
+```
+
+Run specific package tests:
+```bash
+go test ./internal/pkg/metadata
+```
+
+### Testing TV Show Functionality
+
+To test the TV show metadata functionality with sample files:
+
+1. Generate test videos (requires FFmpeg):
+```bash
+./tools/generate_test_videos.sh
+```
+
+2. Test TV show detection in preview mode:
+```bash
+go run cmd/vidkit/main.go --preview test_videos/Breaking.Bad.S01E01.Pilot.mp4
+```
+
+3. Test batch processing of multiple formats:
+```bash
+go run cmd/vidkit/main.go --preview --batch test_videos/*.mp4
+```
+
+### Testing Different Naming Formats
+
+Test with custom TV show format:
+```bash
+go run cmd/vidkit/main.go --preview --tv-format "{title}.S{season:02d}E{episode:02d}.{episode_title}" test_videos/Breaking.Bad.S01E05.Gray.Matter.mp4
+```
+
+Test with scene-style naming (dots instead of spaces):
+```bash
+go run cmd/vidkit/main.go --preview --scene test_videos/Breaking.Bad.S01E05.Gray.Matter.mp4
+```
+
+For more detailed testing information, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Filename Format Guidelines
+
+For optimal metadata extraction, VidKit has specific rules for recognizing different components in filenames:
+
+### Year Detection
+
+Years must be enclosed in parentheses or square brackets to be recognized:
+- `The Matrix (1999).mp4` - Year will be detected as 1999
+- `The Matrix [1999].mp4` - Year will be detected as 1999
+- `The.Matrix.1999.mp4` - Year will NOT be detected (will be treated as part of title)
+
+This explicit delimiter requirement helps avoid false positives when numbers appear in titles.

@@ -60,35 +60,114 @@ func processFile(path string, cfg *config.Config, metadataProvider *metadata.TMD
 		}
 	}
 
-	// Look up movie metadata if enabled
-	var movieData *metadata.MovieMetadata
-	if !cfg.NoMetadata {
-		fmt.Println("\n=== Looking up metadata... ===")
-		searchInfo := metadata.ExtractMovieInfo(path)
-		if searchInfo.Year > 0 {
-			fmt.Printf("Searching for '%s' (year: %d)...\n", searchInfo.Title, searchInfo.Year)
-		} else {
-			fmt.Printf("Searching for '%s'...\n", searchInfo.Title)
-		}
+	// Check if metadata is enabled
+	if cfg.NoMetadata {
+		return nil
+	}
 
-		movieData, err = metadataProvider.SearchMovie(searchInfo, cfg.Language)
-		if err != nil {
-			fmt.Printf("Failed to lookup metadata: %v\n", err)
-		} else {
-			fmt.Println("\n=== Movie Metadata ===")
-			fmt.Printf("Title: %s\n", movieData.Title)
-			fmt.Printf("Year: %d\n", movieData.Year)
-			fmt.Printf("Overview: %s\n", movieData.Overview)
+	// First, check if the filename matches a TV show pattern
+	tvShowInfo := metadata.ExtractTVShowInfo(path)
+	if tvShowInfo.Season > 0 && tvShowInfo.Episode > 0 {
+		// This looks like a TV show, use TvMaze provider
+		return processTVShow(path, info, tvShowInfo, cfg)
+	}
+
+	// Otherwise, process as a movie
+	return processMovie(path, info, metadataProvider, cfg)
+}
+
+func processTVShow(path string, info *media.VideoInfo, tvShowInfo metadata.TVShowSearch, cfg *config.Config) error {
+	fmt.Println("\n=== Looking up TV show metadata... ===")
+	if tvShowInfo.Year > 0 {
+		fmt.Printf("Searching for '%s' (year: %d) - S%02dE%02d\n", 
+			tvShowInfo.Title, tvShowInfo.Year, tvShowInfo.Season, tvShowInfo.Episode)
+	} else {
+		fmt.Printf("Searching for '%s' - S%02dE%02d\n", 
+			tvShowInfo.Title, tvShowInfo.Season, tvShowInfo.Episode)
+	}
+
+	// Create TvMaze provider
+	tvMazeProvider := metadata.NewTvMazeProvider()
+
+	// Get TV show metadata
+	tvShowData, err := tvMazeProvider.SearchTVShow(tvShowInfo, cfg.Language)
+	if err != nil {
+		fmt.Printf("Failed to lookup TV show metadata: %v\n", err)
+		return nil
+	}
+
+	// Print TV show information
+	fmt.Println("\n=== TV Show Metadata ===")
+	fmt.Printf("Title: %s\n", tvShowData.Title)
+	fmt.Printf("Year: %d\n", tvShowData.Year)
+	fmt.Printf("Network: %s\n", tvShowData.Network)
+	fmt.Printf("Status: %s\n", tvShowData.Status)
+	if len(tvShowData.Genres) > 0 {
+		fmt.Printf("Genres: %s\n", strings.Join(tvShowData.Genres, ", "))
+	}
+	fmt.Printf("Season Count: %d\n", tvShowData.SeasonCount)
+
+	// Print episode information if available
+	if tvShowData.Season > 0 && tvShowData.Episode > 0 {
+		fmt.Println("\n=== Episode Information ===")
+		fmt.Printf("Season: %d\n", tvShowData.Season)
+		fmt.Printf("Episode: %d\n", tvShowData.Episode)
+		fmt.Printf("Title: %s\n", tvShowData.EpisodeTitle)
+		if tvShowData.AirDate != "" {
+			fmt.Printf("Air Date: %s\n", tvShowData.AirDate)
 		}
 	}
+
+	fmt.Printf("Overview: %s\n", tvShowData.Overview)
 
 	// Generate new filename
-	var newName string
-	if movieData != nil {
-		newName = generateFilename(path, info, movieData, cfg)
-	} else {
-		newName = path
+	newName := generateTVFilename(path, info, tvShowData, cfg)
+
+	fmt.Println("\n=== File Renaming ===")
+	fmt.Printf("Original: %s\n", path)
+	fmt.Printf("New name: %s\n", newName)
+
+	if cfg.PreviewMode {
+		fmt.Println("\n[PREVIEW MODE] File would be renamed as shown above")
+		return nil
 	}
+
+	// In batch mode or if user confirms
+	if cfg.BatchMode || confirmRename() {
+		if cfg.NoOverwrite && fileExists(newName) {
+			return fmt.Errorf("target file already exists: %s", newName)
+		}
+		if err := os.Rename(path, newName); err != nil {
+			return fmt.Errorf("error renaming file: %v", err)
+		}
+		fmt.Println("File renamed successfully!")
+	}
+
+	return nil
+}
+
+func processMovie(path string, info *media.VideoInfo, metadataProvider *metadata.TMDbProvider, cfg *config.Config) error {
+	fmt.Println("\n=== Looking up movie metadata... ===")
+	searchInfo := metadata.ExtractMovieInfo(path)
+	if searchInfo.Year > 0 {
+		fmt.Printf("Searching for '%s' (year: %d)...\n", searchInfo.Title, searchInfo.Year)
+	} else {
+		fmt.Printf("Searching for '%s'...\n", searchInfo.Title)
+	}
+
+	movieData, err := metadataProvider.SearchMovie(searchInfo, cfg.Language)
+	if err != nil {
+		fmt.Printf("Failed to lookup metadata: %v\n", err)
+		return nil
+	}
+	
+	fmt.Println("\n=== Movie Metadata ===")
+	fmt.Printf("Title: %s\n", movieData.Title)
+	fmt.Printf("Year: %d\n", movieData.Year)
+	fmt.Printf("Overview: %s\n", movieData.Overview)
+
+	// Generate new filename
+	newName := generateFilename(path, info, movieData, cfg)
 
 	fmt.Println("\n=== File Renaming ===")
 	fmt.Printf("Original: %s\n", path)
@@ -221,6 +300,69 @@ func generateFilename(originalPath string, info *media.VideoInfo, metadata *meta
 	return filepath.Join(dir, newName+ext)
 }
 
+func generateTVFilename(originalPath string, info *media.VideoInfo, metadata *metadata.TVShowMetadata, cfg *config.Config) string {
+	dir := filepath.Dir(originalPath)
+	ext := filepath.Ext(originalPath)
+
+	// Get video stream info
+	var res, codec string
+	for _, stream := range info.Streams {
+		if stream.CodecType == "video" {
+			res = resolution.GetStandardResolution(stream.Width, stream.Height)
+			codec = stream.CodecName
+			break
+		}
+	}
+
+	// Format the filename according to the pattern
+	pattern := cfg.TVFormat
+	title := metadata.Title
+	year := fmt.Sprintf("%d", metadata.Year)
+	seasonNum := fmt.Sprintf("%02d", metadata.Season)
+	episodeNum := fmt.Sprintf("%02d", metadata.Episode)
+	episodeTitle := metadata.EpisodeTitle
+
+	// Replace template variables
+	newName := strings.NewReplacer(
+		"{title}", title,
+		"{year}", year,
+		"{season}", fmt.Sprintf("%d", metadata.Season),
+		"{season:02d}", seasonNum,
+		"{episode}", fmt.Sprintf("%d", metadata.Episode),
+		"{episode:02d}", episodeNum,
+		"{episode_title}", episodeTitle,
+		"{resolution}", res,
+		"{codec}", codec,
+	).Replace(pattern)
+
+	// Apply scene style if enabled (use dots)
+	if cfg.SceneStyle {
+		cfg.Separator = "."
+	}
+
+	// Replace spaces with configured separator
+	if cfg.Separator != " " {
+		newName = strings.ReplaceAll(newName, " ", cfg.Separator)
+	}
+
+	// Apply lowercase if enabled
+	if cfg.LowerCase {
+		newName = strings.ToLower(newName)
+	}
+
+	// Clean up filename (remove invalid characters)
+	newName = strings.Map(func(r rune) rune {
+		switch r {
+		case '/', '\\', ':', '*', '?', '"', '<', '>', '|':
+			return '-'
+		default:
+			return r
+		}
+	}, newName)
+
+	return filepath.Join(dir, newName+ext)
+}
+
 func confirmRename() bool {
 	fmt.Print("\nDo you want to rename the file? (y/N): ")
 	var response string
@@ -243,7 +385,7 @@ func main() {
 	noOverwrite := flag.Bool("no-overwrite", false, "prevent relocation if it would overwrite a file")
 	language := flag.String("lang", "en", "metadata language (ISO 639-1 code)")
 	movieFormat := flag.String("movie-format", "{title} ({year}) [{resolution} {codec}]", "movie filename format")
-	tvFormat := flag.String("tv-format", "{series} S{season:02d}E{episode:02d} [{resolution} {codec}]", "TV episode filename format")
+	tvFormat := flag.String("tv-format", "{title} S{season:02d}E{episode:02d} {episode_title} [{resolution} {codec}]", "TV episode filename format")
 	previewMode := flag.Bool("preview", false, "Preview mode: show what would be done without making changes")
 	noMetadata := flag.Bool("no-metadata", false, "Skip online metadata lookup")
 	separator := flag.String("separator", "", "Character to use as separator in filenames (default: space, use '.' for scene style)")
