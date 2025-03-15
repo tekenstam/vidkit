@@ -138,9 +138,9 @@ func TestYourFeature(t *testing.T) {
 
 All test scripts provide consistent output with:
 
-- ✅ Green checkmarks for passing tests
-- ❌ Red X for failing tests
-- ⚠️ Yellow warnings for skipped or conditional tests
+- Green checkmarks for passing tests
+- Red X for failing tests
+- Yellow warnings for skipped or conditional tests
 
 Each script will exit with code 0 if all tests pass, or non-zero if any test fails.
 
@@ -201,3 +201,62 @@ When adding new features to VidKit, follow these guidelines for testing:
 2. Create or extend integration tests for CLI features
 3. Ensure tests work in both local and CI environments
 4. Update documentation if test procedures change
+
+## Testing TV Show Metadata
+
+The TV show metadata functionality is particularly complex and requires careful testing:
+
+### Setup Test Data
+```bash
+# Generate test video files with different naming patterns
+./tools/generate_test_videos.sh
+```
+
+### Test Different Filename Formats
+- Test S01E01 format: `Breaking.Bad.S01E01.Pilot.mp4`
+- Test 1x01 format: `Game.of.Thrones.1x01.mp4`
+- Test descriptive format: `Stranger.Things.Season.1.Episode.1.mp4`
+- Test with year: `The Office (2005) S01E01.mp4`
+- Test with quality info: `Friends.S01E01.DVDRip.x264.mp4`
+
+### Test API Integration
+- The tests use mock HTTP servers to test API interaction
+- Ensure real-world testing with the actual TvMaze API
+- Test error handling for network issues or missing data
+
+### Test Output Formats
+- Test title formatting in output paths
+- Test with and without year in output
+- Test with episode titles in output formats
+
+## Testing Year Extraction Rules
+
+VidKit has specific rules for extracting years from filenames. When testing or adding features, make sure to test:
+
+### Year Extraction Test Cases
+- Years in parentheses: `Movie Title (2023).mp4` (should extract 2023)
+- Years in square brackets: `Movie Title [2023].mp4` (should extract 2023)
+- Years without delimiters: `Movie.Title.2023.mp4` (should NOT extract year)
+- Multiple potential years: `Movie (2023) [2024].mp4` (should extract first valid year)
+
+### Title Preservation
+- When no delimited year is found, the original format should be preserved
+- Example: `The.Matrix.1999.mp4` should maintain dot format
+
+### Metadata Search Impact
+- Test how year extraction affects metadata search accuracy
+- Compare search results with and without proper year delimiting
+- Verify the handling of titles containing numeric sequences
+
+These tests are implemented in the `metadata` package:
+- `TestExtractMovieInfo` in `tmdb_test.go`
+- `TestExtractTVShowInfo` in `tvmaze_test.go`
+
+## Test Mocks
+
+The test files use mock implementations for external dependencies:
+
+- `tmdb_test.go` includes a mock TMDb client
+- `tvmaze_test.go` includes a mock HTTP server for TvMaze responses
+
+When adding new features, follow this pattern to create testable code.
