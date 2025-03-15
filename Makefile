@@ -94,8 +94,8 @@ test-tv-formats: generate-test-videos
 # Test custom formats
 test-custom-format: build
 	@echo "=== Testing custom formats ==="
-	./$(BINARY_NAME) --preview --movie-format "{title}_{year}" test_videos/The.Shawshank.Redemption.1994.1080p.BluRay.x264.mp4
-	./$(BINARY_NAME) --preview --tv-format "{title}.S{season:02d}E{episode:02d}.{episode_title}" test_videos/Breaking.Bad.S01E01.Pilot.mp4
+	./$(BINARY_NAME) --preview --movie-filename-template "{title}_{year}" test_videos/The.Shawshank.Redemption.1994.1080p.BluRay.x264.mp4
+	./$(BINARY_NAME) --preview --tv-filename-template "{title}.S{season:02d}E{episode:02d}.{episode_title}" test_videos/Breaking.Bad.S01E01.Pilot.mp4
 	./$(BINARY_NAME) --preview -s test_videos/Breaking.Bad.S01E01.Pilot.mp4
 
 # Test directory organization
@@ -109,11 +109,11 @@ test-organization-ci: build
 	@echo "Creating test directory..."
 	mkdir -p test_organization
 	@echo "Testing basic movie organization..."
-	./$(BINARY_NAME) --preview --no-metadata --movie-dir "test_organization/Movies/{title} ({year})" test_videos/Inception.2010.1080p.BluRay.x264.mp4
+	./$(BINARY_NAME) --preview --no-metadata --movie-directory-template "test_organization/Movies/{title} ({year})" test_videos/Inception.2010.1080p.BluRay.x264.mp4
 	@echo "Testing alphabetical movie organization..."
-	./$(BINARY_NAME) --preview --no-metadata --movie-dir "test_organization/Movies/{title[0]}/{title} ({year})" test_videos/Inception.2010.1080p.BluRay.x264.mp4
+	./$(BINARY_NAME) --preview --no-metadata --movie-directory-template "test_organization/Movies/{title[0]}/{title} ({year})" test_videos/Inception.2010.1080p.BluRay.x264.mp4
 	@echo "Testing TV season organization..."
-	./$(BINARY_NAME) --preview --no-metadata --tv-dir "test_organization/TV/{title}/Season {season:02d}" test_videos/Breaking.Bad.S01E01.Pilot.mp4
+	./$(BINARY_NAME) --preview --no-metadata --tv-directory-template "test_organization/TV/{title}/Season {season:02d}" test_videos/Breaking.Bad.S01E01.Pilot.mp4
 	@echo "Directory organization tests completed successfully"
 
 # Test resolution detection
