@@ -5,9 +5,10 @@ VidKit is an intelligent video file management system for media enthusiasts and 
 [![Release](https://img.shields.io/github/v/release/tekenstam/vidkit)](https://github.com/tekenstam/vidkit/releases/latest)
 [![Go Version](https://img.shields.io/github/go-mod/go-version/tekenstam/vidkit)](https://golang.org/doc/devel/release.html)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Tests](https://github.com/tekenstam/vidkit/workflows/Test/badge.svg)](https://github.com/tekenstam/vidkit/actions?query=workflow%3ATest)
-[![Integration Tests](https://github.com/tekenstam/vidkit/workflows/Integration%20Tests/badge.svg)](https://github.com/tekenstam/vidkit/actions?query=workflow%3A%22Integration+Tests%22)
+[![Test and Lint](https://github.com/tekenstam/vidkit/actions/workflows/test.yml/badge.svg)](https://github.com/tekenstam/vidkit/actions/workflows/test.yml)
+[![Integration Tests](https://github.com/tekenstam/vidkit/actions/workflows/integration.yml/badge.svg)](https://github.com/tekenstam/vidkit/actions/workflows/integration.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/tekenstam/vidkit)](https://goreportcard.com/report/github.com/tekenstam/vidkit)
+[![Maintained](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/tekenstam/vidkit/commits/main)
 [![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=tekenstam/vidkit)](https://dependabot.com)
 
 ## Overview
