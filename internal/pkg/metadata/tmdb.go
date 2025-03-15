@@ -22,6 +22,7 @@ type MovieMetadata struct {
 	Title    string
 	Year     int
 	Overview string
+	Genres   []string
 }
 
 // TVShowSearch represents a TV show search request
@@ -124,10 +125,17 @@ func (p *TMDbProvider) SearchMovie(search MovieSearch, language string) (*MovieM
 		}
 	}
 
+	// Extract genre names
+	genreNames := make([]string, 0, len(movie.Genres))
+	for _, genre := range movie.Genres {
+		genreNames = append(genreNames, genre.Name)
+	}
+
 	return &MovieMetadata{
 		Title:    movie.Title,
 		Year:     year,
 		Overview: movie.Overview,
+		Genres:   genreNames,
 	}, nil
 }
 

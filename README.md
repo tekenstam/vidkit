@@ -23,18 +23,15 @@ A powerful command-line toolkit for video file analysis, organization, and metad
   - Smart extraction of series name, season and episode from filenames
   - TV show overview and episode details
   - Support for various episode naming conventions
+- Intelligent media organization:
+  - Customizable directory structure templates
+  - Organize by genre, title, year, and more
+  - First-letter categorization for large libraries
+  - Separate templates for movies and TV shows
 - Batch processing:
   - Process single files or entire directories
   - Recursive directory scanning
-  - Supports common video formats (mp4, mkv, avi, etc.)
-- Human-readable resolution standards (e.g., "1080p" instead of just dimensions)
-- Supports standard resolutions from 360p to 8K
-- Smart resolution detection with 10-pixel tolerance
-- Formatted output with proper units (KB/MB/GB, Kbps, fps)
-- Smart file renaming with metadata-based format:
-  - Pattern: `{title} ({year}) [{resolution} {codec}].{ext}`
-  - Example: `Big Buck Bunny (2008) [360p h264].mp4`
-- Preview mode to check changes without modifying files
+  - Preview mode to see changes without applying them
 
 ## Prerequisites
 
@@ -97,6 +94,9 @@ Available options:
 -separator     Character to use as separator in filenames
 -movie-provider Select movie metadata provider (tmdb, omdb)
 -tv-provider    Select TV show metadata provider (tvmaze, tvdb)
+-organize      Enable/disable organizing files into directory structures (default: true)
+-movie-dir     Directory template for movies (e.g., "Movies/{title[0]}/{title} ({year})")
+-tv-dir        Directory template for TV shows (e.g., "TV/{title}/Season {season:02d}")
 -version       Show version information
 ```
 

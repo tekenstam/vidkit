@@ -80,8 +80,13 @@ test-custom-format: generate-test-videos
 	./$(BINARY_NAME) --preview --tv-format "{title}.S{season:02d}E{episode:02d}.{episode_title}" test_videos/Breaking.Bad.S01E01.Pilot.mp4
 	./$(BINARY_NAME) --preview --scene test_videos/Breaking.Bad.S01E01.Pilot.mp4
 
+# Test directory organization
+test-organization: build generate-test-videos
+	@echo "Testing directory organization features..."
+	./tools/test_directory_organization.sh
+
 # Run all tests
-test-all: test test-race generate-test-videos test-tv-formats test-custom-format
+test-all: test test-race generate-test-videos test-tv-formats test-custom-format test-organization
 
 # Run code quality checks - both tests and linting
 quality: test lint
@@ -105,5 +110,6 @@ help:
 	@echo "  make test-tv             - Run TV show-specific tests"
 	@echo "  make test-tv-formats     - Test different TV show naming formats"
 	@echo "  make test-custom-format  - Test custom naming formats"
+	@echo "  make test-organization   - Test directory organization features"
 	@echo "  make test-all            - Run all tests including integration tests"
 	@echo "  make help                - Show this help message"

@@ -187,6 +187,118 @@ vidkit --tv-provider tvdb tvshow.mp4
 | Community Data   | Moderate             | Very active         |
 | Data Richness    | Good                 | Very detailed       |
 
+## Directory Organization
+
+VidKit now supports organizing files into structured directories based on metadata, similar to how media library management software organizes content. This allows for a more organized media collection that's easier to browse manually or through media server software.
+
+### Directory Templates
+
+Directory templates work similarly to filename templates but define the target directory structure for your media files. You can configure these templates in your config file or specify them via command-line flags.
+
+#### Available Variables
+
+**For Movies:**
+- `{title}` - Movie title
+- `{year}` - Release year
+- `{title[0]}` - First letter of the title (useful for alphabetical sorting)
+- `{genre}` - Primary genre of the movie
+
+**For TV Shows:**
+- `{title}` - Series title
+- `{year}` - Release year
+- `{season}` - Season number
+- `{season:02d}` - Season number with leading zero
+- `{title[0]}` - First letter of the title
+- `{genre}` - Primary genre of the series
+- `{network}` - Network or studio that produced the show
+
+### Examples
+
+#### Basic Movie Organization
+
+Command:
+```bash
+vidkit --movie-dir "Movies/{title} ({year})" movie.mp4
+```
+
+Result:
+```
+Original: ~/Downloads/The.Matrix.1999.1080p.BluRay.x264.mp4
+New:      ~/Movies/The Matrix (1999)/The Matrix (1999) [1080p h264].mp4
+```
+
+#### Alphabetical Movie Organization
+
+Command:
+```bash
+vidkit --movie-dir "Movies/{title[0]}/{title} ({year})" movie.mp4
+```
+
+Result:
+```
+Original: ~/Downloads/The.Matrix.1999.1080p.BluRay.x264.mp4
+New:      ~/Movies/T/The Matrix (1999)/The Matrix (1999) [1080p h264].mp4
+```
+
+#### Genre-Based Organization
+
+Command:
+```bash
+vidkit --movie-dir "Movies/By Genre/{genre}/{title} ({year})" movie.mp4
+```
+
+Result:
+```
+Original: ~/Downloads/The.Matrix.1999.1080p.BluRay.x264.mp4
+New:      ~/Movies/By Genre/Action/The Matrix (1999)/The Matrix (1999) [1080p h264].mp4
+```
+
+#### TV Show Organization
+
+Command:
+```bash
+vidkit --tv-dir "TV Shows/{title}/Season {season:02d}" tvshow.mp4
+```
+
+Result:
+```
+Original: ~/Downloads/Breaking.Bad.S01E05.1080p.WEB-DL.AAC2.0.H.264.mkv
+New:      ~/TV Shows/Breaking Bad/Season 01/Breaking Bad S01E05 Gray Matter [1080p h264].mkv
+```
+
+#### Network-Based TV Organization
+
+Command:
+```bash
+vidkit --tv-dir "TV Shows/{network}/{title}/Season {season}" tvshow.mp4
+```
+
+Result:
+```
+Original: ~/Downloads/Breaking.Bad.S01E05.1080p.WEB-DL.AAC2.0.H.264.mkv
+New:      ~/TV Shows/AMC/Breaking Bad/Season 1/Breaking Bad S01E05 Gray Matter [1080p h264].mkv
+```
+
+### Configuration File
+
+You can permanently set your directory organization preferences in the config file:
+
+```json
+{
+  "movie_directory": "Media/Movies/{title[0]}/{title} ({year})",
+  "tv_directory": "Media/TV/{title}/Season {season:02d}",
+  "organize_files": true
+}
+```
+
+### Notes on Organization
+
+- Directory templates can use absolute or relative paths
+- Relative paths are based on the current working directory
+- Missing directories will be created automatically
+- The original file will be moved, not copied
+- The organize feature can be disabled with `--organize=false`
+
 ## Filename Format Guidelines
 
 For successful metadata extraction, VidKit requires specific formatting in your video filenames.
@@ -257,6 +369,9 @@ Options:
   --no-metadata    skip online metadata lookup
   --movie-provider select movie metadata provider (tmdb, omdb)
   --tv-provider    select TV show metadata provider (tvmaze, tvdb)
+  --movie-dir      directory template for movies
+  --tv-dir         directory template for TV shows
+  --organize       organize files into directories (default: true)
 ```
 
 ## Troubleshooting

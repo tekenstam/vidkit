@@ -305,7 +305,6 @@ func processPath(path string, cfg *config.Config) error {
 }
 
 func generateFilename(originalPath string, info *media.VideoInfo, metadata *metadata.MovieMetadata, cfg *config.Config) string {
-	dir := filepath.Dir(originalPath)
 	ext := filepath.Ext(originalPath)
 
 	// Find resolution and codec
@@ -351,12 +350,73 @@ func generateFilename(originalPath string, info *media.VideoInfo, metadata *meta
 		name = strings.ReplaceAll(name, " ", cfg.Separator)
 	}
 
+	// Determine target directory
+	var targetDir string
+	if cfg.OrganizeFiles && cfg.MovieDirectory != "" {
+		// Generate directory path from template
+		dirTemplate := cfg.MovieDirectory
+
+		// Replace variables in directory template
+		dirTemplate = strings.ReplaceAll(dirTemplate, "{title}", metadata.Title)
+		dirTemplate = strings.ReplaceAll(dirTemplate, "{year}", yearStr)
+		
+		// Add first letter of title for alphabetical organization
+		if strings.Contains(dirTemplate, "{title[0]}") {
+			if len(metadata.Title) > 0 {
+				firstLetter := strings.ToUpper(string(metadata.Title[0]))
+				dirTemplate = strings.ReplaceAll(dirTemplate, "{title[0]}", firstLetter)
+			} else {
+				dirTemplate = strings.ReplaceAll(dirTemplate, "{title[0]}", "#")
+			}
+		}
+		
+		// Replace genre if available
+		genre := "Unknown"
+		if len(metadata.Genres) > 0 {
+			genre = metadata.Genres[0]
+		}
+		dirTemplate = strings.ReplaceAll(dirTemplate, "{genre}", genre)
+		
+		// Apply lowercase if configured
+		if cfg.LowerCase {
+			dirTemplate = strings.ToLower(dirTemplate)
+		}
+		
+		// Replace spaces with separator in directory names
+		if cfg.Separator != " " {
+			dirTemplate = strings.ReplaceAll(dirTemplate, " ", cfg.Separator)
+		}
+		
+		// Create absolute path
+		if filepath.IsAbs(dirTemplate) {
+			targetDir = dirTemplate
+		} else {
+			// Use current directory as base if relative path
+			currentDir, err := os.Getwd()
+			if err != nil {
+				currentDir = filepath.Dir(originalPath)
+			}
+			targetDir = filepath.Join(currentDir, dirTemplate)
+		}
+	} else {
+		// If not organizing, use the original directory
+		targetDir = filepath.Dir(originalPath)
+	}
+
+	// Create the target directory if it doesn't exist
+	if cfg.OrganizeFiles && !cfg.PreviewMode {
+		if err := os.MkdirAll(targetDir, 0755); err != nil {
+			fmt.Printf("Warning: Failed to create directory %s: %v\n", targetDir, err)
+			// Fallback to original directory
+			targetDir = filepath.Dir(originalPath)
+		}
+	}
+
 	// Create new filename
-	return filepath.Join(dir, name+ext)
+	return filepath.Join(targetDir, name+ext)
 }
 
 func generateTVFilename(originalPath string, info *media.VideoInfo, metadata *metadata.TVShowMetadata, cfg *config.Config) string {
-	dir := filepath.Dir(originalPath)
 	ext := filepath.Ext(originalPath)
 
 	// Find resolution and codec
@@ -375,39 +435,39 @@ func generateTVFilename(originalPath string, info *media.VideoInfo, metadata *me
 
 	// Replace variables in format string
 	name := format
-
+	
 	// Replace title
 	name = strings.ReplaceAll(name, "{title}", metadata.Title)
-
+	
 	// Replace year if available
 	yearStr := ""
 	if metadata.Year > 0 {
 		yearStr = fmt.Sprintf("%d", metadata.Year)
 	}
 	name = strings.ReplaceAll(name, "{year}", yearStr)
-
+	
 	// Replace season
 	season := fmt.Sprintf("%d", metadata.Season)
 	seasonWithZero := fmt.Sprintf("%02d", metadata.Season)
 	name = strings.ReplaceAll(name, "{season:02d}", seasonWithZero)
 	name = strings.ReplaceAll(name, "{season}", season)
-
+	
 	// Replace episode
 	episode := fmt.Sprintf("%d", metadata.Episode)
 	episodeWithZero := fmt.Sprintf("%02d", metadata.Episode)
 	name = strings.ReplaceAll(name, "{episode:02d}", episodeWithZero)
 	name = strings.ReplaceAll(name, "{episode}", episode)
-
+	
 	// Replace episode title
 	episodeTitle := metadata.EpisodeTitle
 	if episodeTitle == "" {
 		episodeTitle = "Episode " + episode
 	}
 	name = strings.ReplaceAll(name, "{episode_title}", episodeTitle)
-
+	
 	// Replace resolution
 	name = strings.ReplaceAll(name, "{resolution}", resolutionStr)
-
+	
 	// Replace codec
 	name = strings.ReplaceAll(name, "{codec}", codec)
 
@@ -421,8 +481,79 @@ func generateTVFilename(originalPath string, info *media.VideoInfo, metadata *me
 		name = strings.ReplaceAll(name, " ", cfg.Separator)
 	}
 
+	// Determine target directory
+	var targetDir string
+	if cfg.OrganizeFiles && cfg.TVDirectory != "" {
+		// Generate directory path from template
+		dirTemplate := cfg.TVDirectory
+
+		// Replace variables in directory template
+		dirTemplate = strings.ReplaceAll(dirTemplate, "{title}", metadata.Title)
+		dirTemplate = strings.ReplaceAll(dirTemplate, "{year}", yearStr)
+		dirTemplate = strings.ReplaceAll(dirTemplate, "{season}", season)
+		dirTemplate = strings.ReplaceAll(dirTemplate, "{season:02d}", seasonWithZero)
+		
+		// Add first letter of title for alphabetical organization
+		if strings.Contains(dirTemplate, "{title[0]}") {
+			if len(metadata.Title) > 0 {
+				firstLetter := strings.ToUpper(string(metadata.Title[0]))
+				dirTemplate = strings.ReplaceAll(dirTemplate, "{title[0]}", firstLetter)
+			} else {
+				dirTemplate = strings.ReplaceAll(dirTemplate, "{title[0]}", "#")
+			}
+		}
+		
+		// Replace genre if available
+		genre := "Unknown"
+		if len(metadata.Genres) > 0 {
+			genre = metadata.Genres[0]
+		}
+		dirTemplate = strings.ReplaceAll(dirTemplate, "{genre}", genre)
+		
+		// Replace network if available
+		network := metadata.Network
+		if network == "" {
+			network = "Unknown"
+		}
+		dirTemplate = strings.ReplaceAll(dirTemplate, "{network}", network)
+		
+		// Apply lowercase if configured
+		if cfg.LowerCase {
+			dirTemplate = strings.ToLower(dirTemplate)
+		}
+		
+		// Replace spaces with separator in directory names
+		if cfg.Separator != " " {
+			dirTemplate = strings.ReplaceAll(dirTemplate, " ", cfg.Separator)
+		}
+		
+		// Create absolute path
+		if filepath.IsAbs(dirTemplate) {
+			targetDir = dirTemplate
+		} else {
+			// Use current directory as base if relative path
+			currentDir, err := os.Getwd()
+			if err != nil {
+				currentDir = filepath.Dir(originalPath)
+			}
+			targetDir = filepath.Join(currentDir, dirTemplate)
+		}
+	} else {
+		// If not organizing, use the original directory
+		targetDir = filepath.Dir(originalPath)
+	}
+
+	// Create the target directory if it doesn't exist
+	if cfg.OrganizeFiles && !cfg.PreviewMode {
+		if err := os.MkdirAll(targetDir, 0755); err != nil {
+			fmt.Printf("Warning: Failed to create directory %s: %v\n", targetDir, err)
+			// Fallback to original directory
+			targetDir = filepath.Dir(originalPath)
+		}
+	}
+
 	// Create new filename
-	return filepath.Join(dir, name+ext)
+	return filepath.Join(targetDir, name+ext)
 }
 
 func confirmRename() bool {
@@ -439,38 +570,24 @@ func fileExists(path string) bool {
 
 func main() {
 	// Define command-line flags
-	batchMode := flag.Bool("b", false, "Process automatically without prompts")
-	batchModeLong := flag.Bool("batch", false, "Process automatically without prompts")
-
-	recursiveMode := flag.Bool("r", false, "Search subdirectories")
-	recursiveModeLong := flag.Bool("recursive", false, "Search subdirectories")
-
-	lowerCase := flag.Bool("l", false, "Use lowercase for filenames")
-	lowerCaseLong := flag.Bool("lower", false, "Use lowercase for filenames")
-
-	sceneStyle := flag.Bool("s", false, "Use dots instead of spaces in filenames")
-	sceneStyleLong := flag.Bool("scene", false, "Use dots instead of spaces in filenames")
-
-	separator := flag.String("separator", " ", "Character to use as separator in filenames")
-
-	noOverwrite := flag.Bool("no-overwrite", true, "Prevent renaming if it would overwrite a file")
-
-	previewMode := flag.Bool("preview", false, "Show what would be done without making changes")
-
-	noMetadata := flag.Bool("no-metadata", false, "Skip online metadata lookup")
-
-	language := flag.String("lang", "en", "Metadata language (ISO 639-1 code)")
-
+	batchMode := flag.Bool("b", false, "Batch mode: process automatically without interactive prompts")
+	recursive := flag.Bool("r", false, "Search recursively in directories")
+	lowercase := flag.Bool("l", false, "Use lowercase characters in filenames")
+	sceneStyle := flag.Bool("s", false, "Use dots in place of spaces (scene style)")
+	previewMode := flag.Bool("preview", false, "Preview mode (show what would be done, but don't make changes)")
+	noMetadata := flag.Bool("no-metadata", false, "Skip metadata lookup")
+	noOverwrite := flag.Bool("no-overwrite", false, "Don't rename if target file exists")
+	lang := flag.String("lang", "en", "Metadata language (ISO 639-1 code)")
 	movieFormat := flag.String("movie-format", "", "Custom format for movie files")
 	tvFormat := flag.String("tv-format", "", "Custom format for TV show files")
-
+	separator := flag.String("separator", "", "Character to use as separator in filenames")
+	movieProvider := flag.String("movie-provider", "", "Select movie metadata provider (tmdb, omdb)")
+	tvProvider := flag.String("tv-provider", "", "Select TV show metadata provider (tvmaze, tvdb)")
+	organize := flag.Bool("organize", true, "Organize files into directories based on metadata")
+	movieDir := flag.String("movie-dir", "", "Directory template for movies (e.g., 'Movies/{title[0]}/{title} ({year})')")
+	tvDir := flag.String("tv-dir", "", "Directory template for TV shows (e.g., 'TV/{title}/Season {season:02d}')")
 	showVersion := flag.Bool("version", false, "Show version information")
 
-	// Add new flags for provider selection
-	movieProvider := flag.String("movie-provider", "", "Movie metadata provider (tmdb, omdb)")
-	tvProvider := flag.String("tv-provider", "", "TV show metadata provider (tvmaze, tvdb)")
-
-	// Parse command-line flags
 	flag.Parse()
 
 	// Show version and exit if requested
@@ -488,23 +605,23 @@ func main() {
 	}
 
 	// Override config with command-line flags
-	if *batchMode || *batchModeLong {
+	if *batchMode {
 		cfg.BatchMode = true
 	}
 
-	if *recursiveMode || *recursiveModeLong {
+	if *recursive {
 		cfg.Recursive = true
 	}
 
-	if *lowerCase || *lowerCaseLong {
+	if *lowercase {
 		cfg.LowerCase = true
 	}
 
-	if *sceneStyle || *sceneStyleLong {
+	if *sceneStyle {
 		cfg.SceneStyle = true
 	}
 
-	if *separator != " " {
+	if *separator != "" {
 		cfg.Separator = *separator
 	}
 
@@ -520,8 +637,8 @@ func main() {
 		cfg.NoMetadata = true
 	}
 
-	if *language != "en" {
-		cfg.Language = *language
+	if *lang != "en" {
+		cfg.Language = *lang
 	}
 
 	if *movieFormat != "" {
@@ -560,6 +677,11 @@ func main() {
 		fmt.Printf("Error in configuration: %v\n", err)
 		os.Exit(1)
 	}
+
+	// Set organize flags
+	cfg.OrganizeFiles = *organize
+	cfg.MovieDirectory = *movieDir
+	cfg.TVDirectory = *tvDir
 
 	// Check if we have any paths to process
 	if flag.NArg() == 0 {

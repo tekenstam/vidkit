@@ -46,6 +46,11 @@ type Config struct {
 	// Formatting options
 	MovieFormat string `json:"movie_format"`
 	TVFormat    string `json:"tv_format"`
+
+	// Directory organization options
+	MovieDirectory string `json:"movie_directory"` // Template for movie directory structure
+	TVDirectory    string `json:"tv_directory"`    // Template for TV show directory structure
+	OrganizeFiles  bool   `json:"organize_files"` // Whether to move files to organized directories
 }
 
 // ConfigFilePath returns the path to the config file
@@ -191,5 +196,8 @@ func DefaultConfig() *Config {
 		MovieFormat:    "{title} ({year}) [{resolution} {codec}]",
 		TVFormat:       "{title} S{season:02d}E{episode:02d} {episode_title} [{resolution} {codec}]",
 		EnableMetadata: true,
+		MovieDirectory: "{genre}/{title} ({year})",
+		TVDirectory:    "{genre}/{title}/Season {season}",
+		OrganizeFiles:  true,
 	}
 }

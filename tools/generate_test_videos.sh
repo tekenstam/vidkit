@@ -60,6 +60,20 @@ create_test_video "test_videos/Friends.S01E02.The.One.with.the.Sonogram.at.the.E
 create_test_video "test_videos/Friends (1994) S01E01.mp4"
 create_test_video "test_videos/Friends.S01E01.DVDRip.x264.mp4"
 
+# The Office (US) (2005)
+create_test_video "test_videos/The.Office.US.S01E01.Pilot.mp4"
+create_test_video "test_videos/The.Office.S01E02.Diversity.Day.mp4"
+create_test_video "test_videos/The Office (US) S01E01.mp4"
+create_test_video "test_videos/The.Office.US.1x01.mp4"
+create_test_video "test_videos/The.Office.S01E01.720p.NBC.WEB-DL.mp4"
+
+# The Good Place (2016)
+create_test_video "test_videos/The.Good.Place.S01E01.Everything.Is.Fine.mp4"
+create_test_video "test_videos/The.Good.Place.S01E02.Flying.mp4"
+create_test_video "test_videos/The Good Place (2016) - Season 1 Episode 1 - Everything Is Fine.mp4"
+create_test_video "test_videos/The.Good.Place.1x01.mp4"
+create_test_video "test_videos/The.Good.Place.S01E01.1080p.NBC.WEB-DL.mp4"
+
 # Files with just show names (no episode info)
 create_test_video "test_videos/Breaking Bad.mp4"
 create_test_video "test_videos/Game of Thrones.mp4"
@@ -73,6 +87,35 @@ create_test_video "test_videos/Breaking_Bad_-_s01e01_-_Pilot.mp4"
 create_test_video "test_videos/The Good Place (2016) - Season 1 Episode 1 - Everything Is Fine.mp4"
 create_test_video "test_videos/Loki.S01E01.Glorious.Purpose.1080p.DSNP.WEB-DL.DDP5.1.Atmos.H.264-CMRG.mp4"
 create_test_video "test_videos/Severance 1x01 Good News About Hell 2160p.mp4"
+
+echo "Generating test movie files..."
+
+# The Shawshank Redemption (1994)
+create_test_video "test_videos/The.Shawshank.Redemption.1994.1080p.BluRay.x264.mp4"
+create_test_video "test_videos/The Shawshank Redemption (1994).mp4"
+create_test_video "test_videos/Shawshank.Redemption.1994.720p.mp4"
+
+# Inception (2010)
+create_test_video "test_videos/Inception.2010.1080p.BluRay.x264.mp4"
+create_test_video "test_videos/Inception (2010).mp4"
+create_test_video "test_videos/Inception.2010.720p.mp4"
+
+# The Dark Knight (2008)
+create_test_video "test_videos/The.Dark.Knight.2008.1080p.BluRay.x264.mp4"
+create_test_video "test_videos/The Dark Knight (2008).mp4"
+create_test_video "test_videos/The.Dark.Knight.2008.4K.HDR.mp4"
+
+# Pulp Fiction (1994)
+create_test_video "test_videos/Pulp.Fiction.1994.1080p.BluRay.x264.mp4"
+create_test_video "test_videos/Pulp Fiction (1994).mp4"
+create_test_video "test_videos/Pulp.Fiction.1994.720p.mp4"
+
+# Interstellar (2014)
+create_test_video "test_videos/Interstellar.2014.1080p.BluRay.x264.mp4"
+create_test_video "test_videos/Interstellar (2014).mp4"
+create_test_video "test_videos/Interstellar.2014.2160p.HDR.mp4"
+
+echo "Test video generation complete!"
 
 # Clean up template
 rm template.mp4
