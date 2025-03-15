@@ -130,7 +130,7 @@ fi
 # Test 6: Custom movie format
 echo -e "\n--- Test 6: Custom movie format ---"
 CUSTOM_FORMAT="{title}_{year}"
-./vidkit --preview -b $NO_METADATA --movie-format "$CUSTOM_FORMAT" "$TEST_MOVIE" 2>&1 | tee output.log
+./vidkit --preview -b $NO_METADATA --movie-filename-template "$CUSTOM_FORMAT" "$TEST_MOVIE" 2>&1 | tee output.log
 if grep -q "panic\|crash\|invalid format" output.log; then
   report_test_result "Custom movie format" 1 "Custom format caused issues"
 else
@@ -180,8 +180,8 @@ fi
 
 # Test 11: Directory organization
 echo -e "\n--- Test 11: Directory organization options ---"
-DIR_TEMPLATE="test_results/cli/Movies/{title}"
-./vidkit --preview -b $NO_METADATA --movie-dir "$DIR_TEMPLATE" "$TEST_MOVIE" 2>&1 | tee output.log
+DIR_TEMPLATE="test_results/cli/Movies/{title} ({year})"
+./vidkit --preview -b $NO_METADATA --movie-directory-template "$DIR_TEMPLATE" "$TEST_MOVIE" 2>&1 | tee output.log
 # In CI, the directory might appear differently or not show up explicitly
 # Check for either the directory or basic processing of the video
 if ! grep -q "test_results/cli/Movies" output.log && ! grep -q "Resolution:" output.log; then

@@ -56,7 +56,7 @@ chmod 555 test_results/errors/readonly
 if [ -d "test_videos" ] && [ -n "$(ls -A test_videos/*.mp4 2>/dev/null)" ]; then
   # Find a test video
   TEST_VIDEO=$(ls test_videos/*.mp4 | head -1)
-  ./vidkit --preview -b $NO_METADATA --movie-dir "test_results/errors/readonly" "$TEST_VIDEO" 2>&1 | tee output.log
+  ./vidkit --preview -b $NO_METADATA --movie-directory-template "test_results/errors/readonly" "$TEST_VIDEO" 2>&1 | tee output.log
   if ! grep -q "Error\|Permission\|Failed" output.log; then
     echo "❌ Failed: Should report error for read-only directory"
   else
@@ -127,7 +127,7 @@ echo -e "\n--- Test 6: Invalid format string ---"
 if [ -d "test_videos" ] && [ -n "$(ls -A test_videos/*.mp4 2>/dev/null)" ]; then
   # Find a test video
   TEST_VIDEO=$(ls test_videos/*.mp4 | head -1)
-  ./vidkit --preview -b $NO_METADATA --movie-format "{invalid_variable}" "$TEST_VIDEO" 2>&1 | tee output.log
+  ./vidkit --preview -b $NO_METADATA --movie-filename-template "{invalid_variable}" "$TEST_VIDEO" 2>&1 | tee output.log
   # Check if it handles invalid variables in the format string
   if grep -q "panic\|crash" output.log; then
     echo "❌ Failed: Program crashed on invalid format string"
