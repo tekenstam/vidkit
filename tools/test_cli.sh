@@ -100,7 +100,7 @@ fi
 
 # Test 3: Preview mode
 echo -e "\n--- Test 3: Preview mode ---"
-./vidkit --preview -b $NO_METADATA "$TEST_MOVIE" 2>&1 | tee output.log
+./vidkit --preview --batch $NO_METADATA "$TEST_MOVIE" 2>&1 | tee output.log
 # In CI environment, "PREVIEW MODE" might not appear in the same way
 # so check for either PREVIEW MODE or basic video information
 if ! grep -q "PREVIEW MODE" output.log && ! grep -q "Resolution:" output.log; then
@@ -111,7 +111,7 @@ fi
 
 # Test 4: No-metadata flag
 echo -e "\n--- Test 4: No-metadata flag ---"
-./vidkit --preview -b --no-metadata "$TEST_MOVIE" 2>&1 | tee output.log
+./vidkit --preview --batch --no-metadata "$TEST_MOVIE" 2>&1 | tee output.log
 if grep -q "Looking up movie metadata" output.log; then
   report_test_result "No-metadata flag" 1 "Metadata lookup still performed despite no-metadata flag"
 else
@@ -120,7 +120,7 @@ fi
 
 # Test 5: Language option
 echo -e "\n--- Test 5: Language option ---"
-./vidkit --preview -b $NO_METADATA --lang fr "$TEST_MOVIE" 2>&1 | tee output.log
+./vidkit --preview --batch $NO_METADATA --lang fr "$TEST_MOVIE" 2>&1 | tee output.log
 if grep -q "panic\|crash\|invalid language" output.log; then
   report_test_result "Language option" 1 "Language option caused issues"
 else
@@ -130,7 +130,7 @@ fi
 # Test 6: Custom movie format
 echo -e "\n--- Test 6: Custom movie format ---"
 CUSTOM_FORMAT="{title}_{year}"
-./vidkit --preview -b $NO_METADATA --movie-format "$CUSTOM_FORMAT" "$TEST_MOVIE" 2>&1 | tee output.log
+./vidkit --preview --batch $NO_METADATA --movie-filename-template "$CUSTOM_FORMAT" "$TEST_MOVIE" 2>&1 | tee output.log
 if grep -q "panic\|crash\|invalid format" output.log; then
   report_test_result "Custom movie format" 1 "Custom format caused issues"
 else
@@ -139,7 +139,7 @@ fi
 
 # Test 7: Lowercase flag
 echo -e "\n--- Test 7: Lowercase flag ---"
-./vidkit --preview -b $NO_METADATA --lowercase "$TEST_MOVIE" 2>&1 | tee output.log
+./vidkit --preview --batch $NO_METADATA --lowercase "$TEST_MOVIE" 2>&1 | tee output.log
 if grep -q "panic\|crash" output.log; then
   report_test_result "Lowercase flag" 1 "Lowercase flag caused crash"
 else
@@ -148,7 +148,7 @@ fi
 
 # Test 8: Batch mode
 echo -e "\n--- Test 8: Batch mode ---"
-./vidkit --preview -b $NO_METADATA "$TEST_MOVIE" 2>&1 | tee output.log
+./vidkit --preview --batch $NO_METADATA "$TEST_MOVIE" 2>&1 | tee output.log
 if grep -q "panic\|crash\|error" output.log; then
   report_test_result "Batch mode flag" 1 "Batch mode flag caused issue"
 else
@@ -157,7 +157,7 @@ fi
 
 # Test 9: Scene style
 echo -e "\n--- Test 9: Scene style flag ---"
-./vidkit --preview -b $NO_METADATA -s "$TEST_MOVIE" 2>&1 | tee output.log
+./vidkit --preview --batch $NO_METADATA --scene-style "$TEST_MOVIE" 2>&1 | tee output.log
 if grep -q "panic\|crash\|invalid scene" output.log; then
   report_test_result "Scene style flag" 1 "Scene style flag caused issues"
 else
@@ -168,7 +168,7 @@ fi
 echo -e "\n--- Test 10: Provider selection ---"
 # Skip provider test in no-metadata mode
 if [ -z "$NO_METADATA" ]; then
-  ./vidkit --preview -b --movie-provider tmdb "$TEST_MOVIE" 2>&1 | tee output.log
+  ./vidkit --preview --batch --movie-provider tmdb "$TEST_MOVIE" 2>&1 | tee output.log
   if grep -q "invalid provider\|unknown provider" output.log; then
     report_test_result "Provider selection" 1 "Valid provider was rejected"
   else
@@ -180,8 +180,8 @@ fi
 
 # Test 11: Directory organization
 echo -e "\n--- Test 11: Directory organization options ---"
-DIR_TEMPLATE="test_results/cli/Movies/{title}"
-./vidkit --preview -b $NO_METADATA --movie-dir "$DIR_TEMPLATE" "$TEST_MOVIE" 2>&1 | tee output.log
+DIR_TEMPLATE="test_results/cli/Movies/{title} ({year})"
+./vidkit --preview --batch $NO_METADATA --movie-directory-template "$DIR_TEMPLATE" "$TEST_MOVIE" 2>&1 | tee output.log
 # In CI, the directory might appear differently or not show up explicitly
 # Check for either the directory or basic processing of the video
 if ! grep -q "test_results/cli/Movies" output.log && ! grep -q "Resolution:" output.log; then
@@ -192,7 +192,7 @@ fi
 
 # Test 12: Multiple arguments
 echo -e "\n--- Test 12: Multiple arguments ---"
-./vidkit --preview -b $NO_METADATA --no-metadata --lowercase "$TEST_MOVIE" 2>&1 | tee output.log
+./vidkit --preview --batch $NO_METADATA --no-metadata --lowercase "$TEST_MOVIE" 2>&1 | tee output.log
 if grep -q "panic\|crash\|conflict" output.log; then
   report_test_result "Multiple arguments" 1 "Multiple arguments caused issues"
 else
@@ -201,7 +201,7 @@ fi
 
 # Test 13: Unknown flag handling
 echo -e "\n--- Test 13: Unknown flag handling ---"
-./vidkit --preview -b $NO_METADATA --non-existent-flag "$TEST_MOVIE" 2>&1 | tee output.log
+./vidkit --preview --batch $NO_METADATA --non-existent-flag "$TEST_MOVIE" 2>&1 | tee output.log
 if grep -q "panic\|crash" output.log; then
   report_test_result "Unknown flag handling" 1 "Program crashed when handling unknown flag"
 else

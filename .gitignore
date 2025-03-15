@@ -9,6 +9,7 @@
 
 # Test binary, built with `go test -c`
 *.test
+output.log
 
 # Output of the go coverage tool
 *.out
