@@ -174,6 +174,38 @@ Do you want to rename the file? (y/N):
 - 4K (3840x2160)
 - 8K (7680x4320)
 
+## Development
+
+VidKit is built with Go and follows standard Go project practices.
+
+### Building from Source
+
+```bash
+git clone https://github.com/tekenstam/vidkit.git
+cd vidkit
+go build -o vidkit ./cmd/vidkit
+```
+
+### Code Quality
+
+VidKit uses Go's native linting tools to maintain code quality:
+
+- `go vet` - Checks for common code issues and bugs
+- `go fmt` - Ensures consistent code formatting
+
+To run these checks locally:
+
+```bash
+make lint      # Runs all linting checks
+make test      # Runs all unit tests
+make quality   # Runs both tests and linting
+```
+
+### Dependencies
+
+- Go 1.21 or higher
+- FFmpeg (for video analysis)
+
 ## Testing
 
 VidKit includes various tests for ensuring proper functionality.
