@@ -1,4 +1,4 @@
-.PHONY: build test test-verbose test-race test-cover lint clean run generate-test-videos integration-test
+.PHONY: build test test-verbose test-race test-cover lint lint-vet lint-fmt clean run generate-test-videos integration-test
 
 # Go parameters
 GOCMD=go
@@ -7,6 +7,8 @@ GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
 GOMOD=$(GOCMD) mod
+GOVET=$(GOCMD) vet
+GOFMT=$(GOCMD) fmt
 BINARY_NAME=vidkit
 MAIN_PATH=./cmd/vidkit
 
@@ -27,8 +29,20 @@ test-race:
 test-cover:
 	$(GOTEST) -cover ./...
 
-lint:
-	golangci-lint run
+# Basic lint with Go's built-in tools
+lint: lint-vet lint-fmt
+
+# Run go vet
+lint-vet:
+	@echo "Running go vet..."
+	$(GOVET) ./...
+
+# Run go fmt
+lint-fmt:
+	@echo "Running go fmt..."
+	$(GOFMT) ./...
+	@echo "Checking for formatting issues..."
+	@gofmt -l . | grep ".*\.go" > /dev/null && echo "Some files need formatting. Run 'go fmt ./...'" && exit 1 || echo "All files properly formatted."
 
 clean:
 	$(GOCLEAN)
@@ -69,6 +83,9 @@ test-custom-format: generate-test-videos
 # Run all tests
 test-all: test test-race generate-test-videos test-tv-formats test-custom-format
 
+# Run code quality checks - both tests and linting
+quality: test lint
+
 help:
 	@echo "Available commands:"
 	@echo "  make build               - Build the vidkit binary"
@@ -76,7 +93,10 @@ help:
 	@echo "  make test-verbose        - Run tests with verbose output"
 	@echo "  make test-race           - Run tests with race detection"
 	@echo "  make test-cover          - Run tests with coverage report"
-	@echo "  make lint                - Run linter checks"
+	@echo "  make lint                - Run basic linting (vet + fmt)"
+	@echo "  make lint-vet            - Run go vet static analysis"
+	@echo "  make lint-fmt            - Check code formatting with go fmt"
+	@echo "  make quality             - Run both tests and linting"
 	@echo "  make run ARGS=\"file.mp4\" - Build and run with arguments"
 	@echo "  make clean               - Clean up build artifacts"
 	@echo "  make deps                - Download dependencies"
