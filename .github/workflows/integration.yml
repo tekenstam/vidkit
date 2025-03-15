@@ -1,0 +1,65 @@
+name: Integration Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      comment:
+        description: 'Comment for manual trigger'
+        required: false
+        default: 'Manual integration test run'
+
+jobs:
+  integration-test:
+    name: Run Integration Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+          check-latest: true
+
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Run CI integration tests
+        run: make ci-integration-test
+
+      - name: Test directory organization features
+        run: |
+          echo "Testing directory organization features..."
+          # Create test directory
+          mkdir -p test_organization
+          
+          # Test basic movie organization
+          ./vidkit --preview --movie-dir "test_organization/Movies/{title} ({year})" test_videos/Inception.2010.1080p.BluRay.x264.mp4 | tee output.log
+          grep -q "test_organization/Movies/Inception" output.log || { echo "Basic movie organization failed"; exit 1; }
+          
+          # Test alphabetical movie organization
+          ./vidkit --preview --movie-dir "test_organization/Movies/{title[0]}/{title} ({year})" test_videos/Inception.2010.1080p.BluRay.x264.mp4 | tee output.log
+          grep -q "test_organization/Movies/I/Inception" output.log || { echo "Alphabetical movie organization failed"; exit 1; }
+          
+          # Test TV season organization
+          ./vidkit --preview --tv-dir "test_organization/TV/{title}/Season {season:02d}" test_videos/Breaking.Bad.S01E01.Pilot.mp4 | tee output.log
+          grep -q "test_organization/TV/Breaking Bad/Season 01" output.log || { echo "TV season organization failed"; exit 1; }
+      
+      - name: Archive test files on failure
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-outputs
+          path: |
+            output.log
+            test_videos/
+            test_organization/

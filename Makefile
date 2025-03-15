@@ -61,8 +61,19 @@ generate-test-videos:
 	./tools/generate_test_videos.sh
 
 # Run integration tests with test videos
-integration-test: generate-test-videos
+integration-test: build generate-test-videos
+	@echo "=== Running integration tests ==="
 	./$(BINARY_NAME) --preview --batch test_videos/*.mp4
+	@echo "Integration tests completed successfully"
+
+# CI-specific integration tests (more stringent, fails on errors)
+ci-integration-test: build generate-test-videos test-tv-formats test-organization
+	@echo "=== Running CI integration tests ==="
+	./$(BINARY_NAME) --preview test_videos/Breaking.Bad.S01E01.Pilot.mp4
+	./$(BINARY_NAME) --preview test_videos/The.Shawshank.Redemption.1994.1080p.BluRay.x264.mp4
+	./$(BINARY_NAME) --preview test_videos/Game.of.Thrones.1x01.mp4
+	./$(BINARY_NAME) --preview "test_videos/The Good Place (2016) - Season 1 Episode 1 - Everything Is Fine.mp4"
+	@echo "CI integration tests completed successfully"
 
 # Test TV show functionality
 test-tv:
@@ -107,6 +118,7 @@ help:
 	@echo "  make deps                - Download dependencies"
 	@echo "  make generate-test-videos - Generate test video files"
 	@echo "  make integration-test    - Run integration tests with test videos"
+	@echo "  make ci-integration-test - Run CI-specific integration tests (stricter)"
 	@echo "  make test-tv             - Run TV show-specific tests"
 	@echo "  make test-tv-formats     - Test different TV show naming formats"
 	@echo "  make test-custom-format  - Test custom naming formats"

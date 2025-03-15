@@ -119,6 +119,59 @@ The test files use mock implementations for external dependencies:
 
 When adding new features, follow this pattern to create testable code.
 
+### Integration Tests
+
+VidKit includes several integration tests to verify proper behavior with real-world examples:
+
+- **Basic Integration Test**: Tests file detection and basic operations
+  ```bash
+  make integration-test
+  ```
+
+- **TV Show Format Tests**: Tests various TV show filename formats
+  ```bash
+  make test-tv-formats
+  ```
+
+- **Custom Format Tests**: Tests custom formatting options
+  ```bash
+  make test-custom-format
+  ```
+
+- **Directory Organization Tests**: Tests metadata-based directory organization
+  ```bash
+  make test-organization
+  ```
+
+- **CI Integration Tests**: A comprehensive test suite designed for CI environments
+  ```bash
+  make ci-integration-test
+  ```
+
+### GitHub Actions
+
+The project includes multiple GitHub Actions workflows:
+
+1. **Test and Lint**: Runs unit tests and code linting
+2. **Integration Tests**: Runs integration tests to verify functionality with real-world examples
+3. **Release**: Builds and publishes new releases
+
+When submitting a pull request, make sure all tests pass with:
+
+```bash
+make test-all
+```
+
+### Test Videos
+
+The test videos are automatically generated using FFmpeg. You can regenerate them with:
+
+```bash
+make generate-test-videos
+```
+
+No actual video content is included in the repository - the test files are small, valid MP4 containers with test patterns.
+
 ## Pull Request Process
 
 1. Create a new branch for your feature or fix
