@@ -17,7 +17,7 @@ mkdir -p test_results/errors/input
 
 # Test 1: Non-existent file
 echo -e "\n--- Test 1: Non-existent file ---"
-./vidkit --preview test_results/errors/nonexistent_file.mp4 2>&1 | tee output.log
+./vidkit --preview --batch test_results/errors/nonexistent_file.mp4 2>&1 | tee output.log
 if ! grep -q "Error" output.log; then
   echo "❌ Failed: Should report error for non-existent file"
   exit 1
@@ -29,7 +29,7 @@ fi
 echo -e "\n--- Test 2: Invalid file format ---"
 # Create an invalid "video" file (text file with mp4 extension)
 echo "This is not a valid video file" > test_results/errors/input/invalid.mp4
-./vidkit --preview test_results/errors/input/invalid.mp4 2>&1 | tee output.log
+./vidkit --preview --batch test_results/errors/input/invalid.mp4 2>&1 | tee output.log
 if ! grep -q "Error\|Failed\|Invalid" output.log; then
   echo "❌ Failed: Should report error for invalid file format"
   exit 1
@@ -45,7 +45,7 @@ chmod 555 test_results/errors/readonly
 if [ -d "test_videos" ] && [ -n "$(ls -A test_videos/*.mp4 2>/dev/null)" ]; then
   # Find a test video
   TEST_VIDEO=$(ls test_videos/*.mp4 | head -1)
-  ./vidkit --movie-dir "test_results/errors/readonly" "$TEST_VIDEO" 2>&1 | tee output.log
+  ./vidkit --preview --batch --movie-dir "test_results/errors/readonly" "$TEST_VIDEO" 2>&1 | tee output.log
   if ! grep -q "Error\|Permission\|Failed" output.log; then
     echo "❌ Failed: Should report error for read-only directory"
   else
@@ -62,7 +62,7 @@ echo -e "\n--- Test 4: Invalid metadata provider ---"
 if [ -d "test_videos" ] && [ -n "$(ls -A test_videos/*.mp4 2>/dev/null)" ]; then
   # Find a test video
   TEST_VIDEO=$(ls test_videos/*.mp4 | head -1)
-  ./vidkit --movie-provider invalid_provider "$TEST_VIDEO" 2>&1 | tee output.log
+  ./vidkit --preview --batch --movie-provider invalid_provider "$TEST_VIDEO" 2>&1 | tee output.log
   if ! grep -q "Error\|Invalid\|provider" output.log; then
     echo "❌ Failed: Should report error for invalid provider"
     exit 1
@@ -96,7 +96,7 @@ if [ -d "test_videos" ] && [ -n "$(ls -A test_videos/*.mp4 2>/dev/null)" ]; then
   fi
   
   # Try to access TMDb without API key
-  ./vidkit --movie-provider tmdb --no-metadata=false "$TEST_MOVIE" 2>&1 | tee output.log
+  ./vidkit --preview --batch --movie-provider tmdb --no-metadata=false "$TEST_MOVIE" 2>&1 | tee output.log
   if ! grep -q "API key\|Error\|Missing" output.log; then
     echo "❌ Failed: Should report error for missing API key"
   else
@@ -116,7 +116,7 @@ echo -e "\n--- Test 6: Invalid format string ---"
 if [ -d "test_videos" ] && [ -n "$(ls -A test_videos/*.mp4 2>/dev/null)" ]; then
   # Find a test video
   TEST_VIDEO=$(ls test_videos/*.mp4 | head -1)
-  ./vidkit --movie-format "{invalid_variable}" "$TEST_VIDEO" 2>&1 | tee output.log
+  ./vidkit --preview --batch --movie-format "{invalid_variable}" "$TEST_VIDEO" 2>&1 | tee output.log
   # Check if it handles invalid variables in the format string
   if grep -q "panic\|crash" output.log; then
     echo "❌ Failed: Program crashed on invalid format string"
@@ -136,7 +136,7 @@ SPECIAL_CHAR_FILE="test_results/errors/input/file with @#%^&!$ characters.mp4"
 ffmpeg -hide_banner -loglevel error -f lavfi -i testsrc=duration=1:size=640x480:rate=30 \
   -c:v libx264 -preset ultrafast -t 1 "$SPECIAL_CHAR_FILE"
 
-./vidkit --preview "$SPECIAL_CHAR_FILE" 2>&1 | tee output.log
+./vidkit --preview --batch "$SPECIAL_CHAR_FILE" 2>&1 | tee output.log
 if grep -q "panic\|crash" output.log; then
   echo "❌ Failed: Program crashed on filename with special characters"
   exit 1
@@ -152,7 +152,7 @@ LONG_NAME_FILE="test_results/errors/input/$(head /dev/urandom | tr -dc A-Za-z0-9
 ffmpeg -hide_banner -loglevel error -f lavfi -i testsrc=duration=1:size=640x480:rate=30 \
   -c:v libx264 -preset ultrafast -t 1 "$LONG_NAME_FILE"
 
-./vidkit --preview "$LONG_NAME_FILE" 2>&1 | tee output.log
+./vidkit --preview --batch "$LONG_NAME_FILE" 2>&1 | tee output.log
 if grep -q "panic\|crash" output.log; then
   echo "❌ Failed: Program crashed on very long filename"
   exit 1
