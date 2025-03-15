@@ -5,6 +5,11 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write  # Needed for goreleaser to publish releases
+  discussions: write  # Allows creating discussions on release
+  packages: write  # Allows publishing packages if needed in the future
+
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
