@@ -91,10 +91,12 @@ test-tv-formats: generate-test-videos
 	./$(BINARY_NAME) --preview test_videos/Game.of.Thrones.1x01.mp4
 	./$(BINARY_NAME) --preview "test_videos/The Good Place (2016) - Season 1 Episode 1 - Everything Is Fine.mp4"
 
-# Test custom formatting
-test-custom-format: generate-test-videos
+# Test custom formats
+test-custom-format: build
+	@echo "=== Testing custom formats ==="
+	./$(BINARY_NAME) --preview --movie-format "{title}_{year}" test_videos/The.Shawshank.Redemption.1994.1080p.BluRay.x264.mp4
 	./$(BINARY_NAME) --preview --tv-format "{title}.S{season:02d}E{episode:02d}.{episode_title}" test_videos/Breaking.Bad.S01E01.Pilot.mp4
-	./$(BINARY_NAME) --preview --scene test_videos/Breaking.Bad.S01E01.Pilot.mp4
+	./$(BINARY_NAME) --preview -s test_videos/Breaking.Bad.S01E01.Pilot.mp4
 
 # Test directory organization
 test-organization: build generate-test-videos

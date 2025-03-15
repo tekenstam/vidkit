@@ -1,0 +1,32 @@
+flag provided but not defined: -non-existent-flag
+Usage of ./vidkit:
+  -b	Batch mode: process automatically without interactive prompts
+  -l	Use lowercase characters in filenames
+  -lang string
+    	Metadata language (ISO 639-1 code) (default "en")
+  -movie-dir string
+    	Directory template for movies (e.g., 'Movies/{title[0]}/{title} ({year})')
+  -movie-format string
+    	Custom format for movie files
+  -movie-provider string
+    	Select movie metadata provider (tmdb, omdb)
+  -no-metadata
+    	Skip metadata lookup
+  -no-overwrite
+    	Don't rename if target file exists
+  -organize
+    	Organize files into directories based on metadata (default true)
+  -preview
+    	Preview mode (show what would be done, but don't make changes)
+  -r	Search recursively in directories
+  -s	Use dots in place of spaces (scene style)
+  -separator string
+    	Character to use as separator in filenames
+  -tv-dir string
+    	Directory template for TV shows (e.g., 'TV/{title}/Season {season:02d}')
+  -tv-format string
+    	Custom format for TV show files
+  -tv-provider string
+    	Select TV show metadata provider (tvmaze, tvdb)
+  -version
+    	Show version information
