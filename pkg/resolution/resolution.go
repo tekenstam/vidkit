@@ -53,16 +53,24 @@ func GetStandardResolution(width, height int) string {
 		return "0p"
 	}
 
-	// First check for exact matches
+	// Check for exact matches
 	for _, res := range StandardResolutions {
 		if width == res.Width && height == res.Height {
 			return res.Name
 		}
 	}
 
-	// If no exact match, determine based on height which is the common
-	// way to name resolutions (e.g., "1080p" refers to the height)
-	
+	// Check for standard heights with tolerance
+	tolerance := 10
+	for _, res := range StandardResolutions {
+		heightMatch := abs(height-res.Height) <= tolerance
+		if heightMatch {
+			// For any resolution with matching height (including ultrawide),
+			// use the standard name based on height
+			return res.Name
+		}
+	}
+
 	// Special case for 4K and 8K which are typically named by approximate width
 	if height > 1440 {
 		if width >= 7000 {
@@ -72,7 +80,7 @@ func GetStandardResolution(width, height int) string {
 		}
 	}
 
-	// For other resolutions, use the height-based naming convention
+	// For non-standard resolutions, use the height-based naming convention
 	return fmt.Sprintf("%dp", height)
 }
 
