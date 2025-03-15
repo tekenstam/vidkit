@@ -50,20 +50,55 @@ Built with Go 1.21+ and powered by FFmpeg, VidKit brings professional media mana
 
 ## Prerequisites
 
-- Go 1.21 or later
 - FFmpeg (specifically ffprobe) installed on your system
-- TMDb API key (required for metadata lookup)
+- TMDb API key (optional, required only for metadata lookup)
 
 ## Installation
 
-1. Build the tool:
+### Option 1: Download Pre-built Binary (Recommended)
+
+1. Download the latest binary for your platform from the [Releases page](https://github.com/tekenstam/vidkit/releases/latest)
+
+**Linux/macOS**:
 ```bash
-go build -o vidkit
+# Download the appropriate binary for your system (examples below)
+# For macOS (Apple Silicon):
+curl -L https://github.com/tekenstam/vidkit/releases/latest/download/vidkit_darwin_arm64.tar.gz -o vidkit.tar.gz
+
+# For macOS (Intel):
+curl -L https://github.com/tekenstam/vidkit/releases/latest/download/vidkit_darwin_amd64.tar.gz -o vidkit.tar.gz
+
+# For Linux (x86_64):
+curl -L https://github.com/tekenstam/vidkit/releases/latest/download/vidkit_linux_amd64.tar.gz -o vidkit.tar.gz
+
+# Extract and install
+tar -xzf vidkit.tar.gz
+chmod +x vidkit
+sudo mv vidkit /usr/local/bin/  # Optional: move to a directory in your PATH
 ```
 
-2. Set up TMDb API key (required for metadata lookup):
-   - Get a free API key from [TMDb](https://www.themoviedb.org/settings/api)
-   - Add it to `~/.config/vidkit/config.json`:
+**Windows**:
+1. Download the Windows zip file (`vidkit_windows_amd64.zip`)
+2. Extract the zip file
+3. Optionally, add the extracted directory to your PATH
+
+### Option 2: Build from Source
+
+For developers working on VidKit or users who prefer to build from the latest source:
+
+```bash
+git clone https://github.com/tekenstam/vidkit.git
+cd vidkit
+go build -o vidkit ./cmd/vidkit
+```
+
+See the [Installation](#installation) section for simpler options using pre-built binaries.
+
+### API Key Setup (for metadata features)
+
+Set up a TMDb API key (required only if you want to use metadata features):
+- Get a free API key from [TMDb](https://www.themoviedb.org/settings/api)
+- Add it to `~/.config/vidkit/config.json`:
 ```json
 {
   "tmdb_api_key": "your_api_key_here"
@@ -76,22 +111,22 @@ The tool will create a template config file if none exists and guide you through
 
 Process a single video file:
 ```bash
-./vidkit <video_file>
+vidkit <video_file>
 ```
 
 Process all videos in a directory (recursively):
 ```bash
-./vidkit <directory>
+vidkit --recursive <directory>
 ```
 
 Preview changes without modifying files:
 ```bash
-./vidkit --preview <file_or_directory>
+vidkit --preview <file_or_directory>
 ```
 
 Skip online metadata lookup:
 ```bash
-./vidkit --no-metadata <file_or_directory>
+vidkit --no-metadata <file_or_directory>
 ```
 
 Available options:
@@ -193,14 +228,6 @@ Do you want to rename the file? (y/N):
 
 VidKit is built with Go and follows standard Go project practices.
 
-### Building from Source
-
-```bash
-git clone https://github.com/tekenstam/vidkit.git
-cd vidkit
-go build -o vidkit ./cmd/vidkit
-```
-
 ### Code Quality
 
 VidKit uses Go's native linting tools to maintain code quality:
@@ -253,24 +280,24 @@ To test the TV show metadata functionality with sample files:
 
 2. Test TV show detection in preview mode:
 ```bash
-go run cmd/vidkit/main.go --preview test_videos/Breaking.Bad.S01E01.Pilot.mp4
+vidkit --preview test_videos/Breaking.Bad.S01E01.Pilot.mp4
 ```
 
 3. Test batch processing of multiple formats:
 ```bash
-go run cmd/vidkit/main.go --preview --batch test_videos/*.mp4
+vidkit --preview --batch test_videos/*.mp4
 ```
 
 ### Testing Different Naming Formats
 
 Test with custom TV show format:
 ```bash
-go run cmd/vidkit/main.go --preview --tv-filename-template "{title}.S{season:02d}E{episode:02d}.{episode_title}" test_videos/Breaking.Bad.S01E05.Gray.Matter.mp4
+vidkit --preview --tv-filename-template "{title}.S{season:02d}E{episode:02d}.{episode_title}" test_videos/Breaking.Bad.S01E05.Gray.Matter.mp4
 ```
 
 Test with scene-style naming (dots instead of spaces):
 ```bash
-go run cmd/vidkit/main.go --preview --scene-style test_videos/Breaking.Bad.S01E05.Gray.Matter.mp4
+vidkit --preview --scene-style test_videos/Breaking.Bad.S01E05.Gray.Matter.mp4
 ```
 
 For more detailed testing information, see [CONTRIBUTING.md](CONTRIBUTING.md).
