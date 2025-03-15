@@ -13,6 +13,13 @@ import (
 	"github.com/tekenstam/vidkit/pkg/resolution"
 )
 
+// Version information set by goreleaser
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
+
 func processFile(path string, cfg *config.Config, metadataProvider *metadata.TMDbProvider) error {
 	info, err := media.GetVideoInfo(path)
 	if err != nil {
@@ -228,6 +235,7 @@ func fileExists(path string) bool {
 
 func main() {
 	// Parse command line flags
+	showVersion := flag.Bool("version", false, "show version information")
 	batchMode := flag.Bool("b", false, "process automatically without interactive prompts")
 	recursive := flag.Bool("r", false, "search for files within nested directories")
 	lowerCase := flag.Bool("l", false, "rename files using lowercase characters")
@@ -241,8 +249,16 @@ func main() {
 	separator := flag.String("separator", "", "Character to use as separator in filenames (default: space, use '.' for scene style)")
 	flag.Parse()
 
+	// Show version information if requested
+	if *showVersion {
+		fmt.Printf("VidKit %s (%s) - built %s\n", version, commit, date)
+		os.Exit(0)
+	}
+
 	args := flag.Args()
 	if len(args) < 1 {
+		fmt.Println("VidKit - Video file analysis and organization tool")
+		fmt.Printf("Version: %s\n\n", version)
 		fmt.Println("Usage: vidkit [options] <file_or_directory>")
 		fmt.Println("\nOptions:")
 		fmt.Println("  -b, --batch      process automatically without interactive prompts")
@@ -252,10 +268,11 @@ func main() {
 		fmt.Println("  --separator      character to use as separator in filenames")
 		fmt.Println("  --no-overwrite   prevent relocation if it would overwrite a file")
 		fmt.Println("  --lang <code>    metadata language (ISO 639-1 code)")
-		fmt.Println("  --movie-format <format> movie filename format")
-		fmt.Println("  --tv-format <format>   TV episode filename format")
+		fmt.Println("  --movie-format   movie filename format template")
+		fmt.Println("  --tv-format      TV episode filename format template")
 		fmt.Println("  --preview        show what would be done without making changes")
 		fmt.Println("  --no-metadata    skip online metadata lookup")
+		fmt.Println("  --version        show version information")
 		os.Exit(1)
 	}
 
