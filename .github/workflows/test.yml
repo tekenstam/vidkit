@@ -33,6 +33,7 @@ jobs:
           go tool cover -func=coverage.txt
 
       - name: Upload coverage to Codecov
+        if: ${{ github.repository_owner == 'tekenstam' }}
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -45,7 +46,10 @@ jobs:
 
       - name: Check code formatting
         run: |
-          # Check if any files need formatting
+          # First format all files
+          go fmt ./...
+          
+          # Then check if any files still need formatting
           if [ -n "$(gofmt -l .)" ]; then
             echo "The following files need formatting:"
             gofmt -l .
