@@ -21,35 +21,39 @@ const (
 	ProviderTVDb   ProviderType = "tvdb"
 )
 
-// Config holds application configuration
+// Config holds application configuration settings for VidKit.
+// This structure is serialized to/from JSON when saving/loading configurations.
+// It contains all user preferences and API keys needed for metadata lookups.
 type Config struct {
-	// Common options
-	TMDbAPIKey     string   `json:"tmdb_api_key"`
-	OMDbAPIKey     string   `json:"omdb_api_key"`
-	TVDbAPIKey     string   `json:"tvdb_api_key"`
-	BatchMode      bool     `json:"batch_mode"`
-	Recursive      bool     `json:"recursive"`
-	LowerCase      bool     `json:"lowercase"`
-	SceneStyle     bool     `json:"scene_style"`
+	// API keys for metadata providers
+	TMDbAPIKey string `json:"tmdb_api_key"` // API key for The Movie Database
+	OMDbAPIKey string `json:"omdb_api_key"` // API key for Open Movie Database
+	TVDbAPIKey string `json:"tvdb_api_key"` // API key for The TV Database
+
+	// Operational modes
+	BatchMode bool `json:"batch_mode"` // Run without interactive prompts
+	Recursive bool `json:"recursive"` // Process directories recursively
+
+	// File handling preferences
+	Lowercase  bool `json:"lowercase"`  // Convert filenames to lowercase
+	SceneStyle bool `json:"scene_style"` // Use dots instead of spaces in filenames
 	Separator      string   `json:"separator"`
 	FileExtensions []string `json:"file_extensions"`
-	Language       string   `json:"language"`
+	Language       string   `json:"language"` // Preferred language for metadata (ISO 639-1 code)
 	NoOverwrite    bool     `json:"no_overwrite"`
 	NoMetadata     bool     `json:"no_metadata"`
 	PreviewMode    bool     `json:"preview_mode"`
-	EnableMetadata bool     `json:"enable_metadata"`
+	OnlyVideo      bool     `json:"only_video"`
 
-	// Provider selection
-	MovieProvider ProviderType `json:"movie_provider"`
-	TVProvider    ProviderType `json:"tv_provider"`
+	// Provider preferences
+	MovieProvider ProviderType `json:"movie_provider"` // Preferred movie metadata provider
+	TVProvider    ProviderType `json:"tv_provider"`    // Preferred TV show metadata provider
 
-	// Formatting options
-	MovieFormat string `json:"movie_format"`
-	TVFormat    string `json:"tv_format"`
-
-	// Directory organization options
-	MovieDirectory string `json:"movie_directory"` // Template for movie directory structure
-	TVDirectory    string `json:"tv_directory"`    // Template for TV show directory structure
+	// Filename and directory templates
+	MovieFilenameTemplate string `json:"movie_filename_template"` // Template for movie filename 
+	TVFilenameTemplate    string `json:"tv_filename_template"`    // Template for TV show filename
+	MovieDirectoryTemplate string `json:"movie_directory_template"` // Template for movie directory organization
+	TVDirectoryTemplate    string `json:"tv_directory_template"`    // Template for TV show directory organization
 	OrganizeFiles  bool   `json:"organize_files"` // Whether to move files to organized directories
 }
 
@@ -68,18 +72,20 @@ func LoadConfig() (*Config, error) {
 		TVDbAPIKey:     "",
 		BatchMode:      false,
 		Recursive:      false,
-		LowerCase:      false,
+		Lowercase:      false,
 		SceneStyle:     false,
 		Separator:      " ",
-		FileExtensions: []string{".mp4", ".mkv", ".avi", ".mov", ".wmv", ".m4v", ".mpg", ".mpeg"},
+		FileExtensions: []string{".mp4", ".mkv", ".avi", ".mov", ".wmv", ".m4v", ".mpg", ".mpeg", ".webm", ".flv", ".ts", ".m2ts", ".mts", ".mxf"},
 		Language:       "en",
-		NoOverwrite:    false,
+		NoOverwrite:    true,
 		NoMetadata:     false,
 		MovieProvider:  ProviderTMDb,
 		TVProvider:     ProviderTVMaze,
-		MovieFormat:    "{title} ({year}) [{resolution} {codec}]",
-		TVFormat:       "{title} S{season:02d}E{episode:02d} {episode_title} [{resolution} {codec}]",
-		EnableMetadata: true,
+		MovieFilenameTemplate: "{title} ({year}) [{resolution} {codec}]",
+		TVFilenameTemplate:    "{title} S{season:02d}E{episode:02d} {episode_title} [{resolution} {codec}]",
+		MovieDirectoryTemplate: "{genre}/{title} ({year})",
+		TVDirectoryTemplate:    "{genre}/{title}/Season {season}",
+		OrganizeFiles: false,
 	}
 
 	// Check if config file exists
@@ -116,17 +122,17 @@ func LoadConfig() (*Config, error) {
 // ValidateConfig validates the configuration
 func ValidateConfig(cfg *Config) error {
 	// Apply default values if needed
-	if cfg.MovieFormat == "" {
-		cfg.MovieFormat = "{title} ({year}) [{resolution} {codec}]"
+	if cfg.MovieFilenameTemplate == "" {
+		cfg.MovieFilenameTemplate = "{title} ({year}) [{resolution} {codec}]"
 	}
 
 	// Apply default TV format if needed
-	if cfg.TVFormat == "" {
-		cfg.TVFormat = "{title} S{season:02d}E{episode:02d} {episode_title} [{resolution} {codec}]"
+	if cfg.TVFilenameTemplate == "" {
+		cfg.TVFilenameTemplate = "{title} S{season:02d}E{episode:02d} {episode_title} [{resolution} {codec}]"
 	}
 
 	// Check if metadata is enabled but no API key is provided
-	if !cfg.NoMetadata && cfg.EnableMetadata {
+	if !cfg.NoMetadata {
 		// Check based on selected providers
 		if cfg.MovieProvider == ProviderTMDb && cfg.TMDbAPIKey == "" {
 			return errors.New("TMDb API key is required for metadata lookup (set tmdb_api_key in config.json)")
@@ -176,28 +182,45 @@ func SetConfigPath(fn func() string) {
 	ConfigFilePath = fn
 }
 
-// DefaultConfig returns a configuration with default values
+// DefaultConfig returns a new Config instance with sensible defaults.
+// This is used when no user configuration exists or when creating a new
+// configuration file for the first time.
 func DefaultConfig() *Config {
 	return &Config{
-		TMDbAPIKey:     "",
-		OMDbAPIKey:     "",
-		TVDbAPIKey:     "",
-		BatchMode:      false,
-		Recursive:      false,
-		LowerCase:      false,
-		SceneStyle:     false,
-		Separator:      " ",
-		FileExtensions: []string{".mp4", ".mkv", ".avi", ".mov", ".wmv", ".m4v", ".mpg", ".mpeg", ".webm", ".flv", ".ts", ".m2ts", ".mts", ".mxf"},
-		Language:       "en",
-		NoOverwrite:    true,
-		NoMetadata:     false,
-		MovieProvider:  ProviderTMDb,
-		TVProvider:     ProviderTVMaze,
-		MovieFormat:    "{title} ({year}) [{resolution} {codec}]",
-		TVFormat:       "{title} S{season:02d}E{episode:02d} {episode_title} [{resolution} {codec}]",
-		EnableMetadata: true,
-		MovieDirectory: "{genre}/{title} ({year})",
-		TVDirectory:    "{genre}/{title}/Season {season}",
-		OrganizeFiles:  true,
+		// Default API keys are empty and must be provided by the user
+		TMDbAPIKey: "",
+		OMDbAPIKey: "",
+		TVDbAPIKey: "",
+
+		// Default operational modes
+		BatchMode: false,
+		Recursive: false,
+
+		// Default file handling preferences
+		Lowercase:  false,
+		SceneStyle: false,
+		Separator:  " ",
+		Language:   "en",
+		
+		NoOverwrite: false,
+		NoMetadata:  false,
+		PreviewMode: false,
+		OnlyVideo:   true,
+
+		// Default providers
+		MovieProvider: ProviderTMDb,
+		TVProvider:    ProviderTVMaze,
+
+		// Default filename templates
+		MovieFilenameTemplate: "{title} ({year}) [{resolution} {codec}]",
+		TVFilenameTemplate:    "{title} - S{season:02d}E{episode:02d} - {episode_title}",
+		
+		// Default directory templates
+		MovieDirectoryTemplate: "{genre}/{title} ({year})",
+		TVDirectoryTemplate:    "{genre}/{title}/Season {season}",
+		OrganizeFiles: false,
+
+		// Default file extensions to process
+		FileExtensions: []string{".mp4", ".mkv", ".avi", ".mov", ".m4v"},
 	}
 }
