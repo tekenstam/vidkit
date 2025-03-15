@@ -1,3 +1,10 @@
+// Package config provides configuration management for VidKit's application settings.
+// It handles loading and saving user configurations, API keys for metadata providers,
+// and operational settings that control VidKit's behavior.
+//
+// The configuration system supports multiple metadata providers for both movies and TV shows,
+// allowing users to select their preferred data source. The package manages API keys,
+// application preferences, and operational modes in a single configuration structure.
 package config
 
 import (
@@ -8,48 +15,50 @@ import (
 	"path/filepath"
 )
 
-// ProviderType defines supported metadata provider types
+// ProviderType defines supported metadata provider types.
+// These represent the available online services that can provide
+// metadata for movies and TV shows for VidKit's analysis.
 type ProviderType string
 
 const (
 	// Movie provider types
-	ProviderTMDb ProviderType = "tmdb"
-	ProviderOMDb ProviderType = "omdb"
+	ProviderTMDb ProviderType = "tmdb" // The Movie Database (primary movie provider)
+	ProviderOMDb ProviderType = "omdb" // Open Movie Database (alternative movie provider)
 
 	// TV show provider types
-	ProviderTVMaze ProviderType = "tvmaze"
-	ProviderTVDb   ProviderType = "tvdb"
+	ProviderTVMaze ProviderType = "tvmaze" // TVMaze (primary TV show provider)
+	ProviderTVDb   ProviderType = "tvdb"   // The TV Database (alternative TV show provider)
 )
 
-// Config holds application configuration
+// Config holds application configuration settings for VidKit.
+// This structure is serialized to/from JSON when saving/loading configurations.
+// It contains all user preferences and API keys needed for metadata lookups.
 type Config struct {
-	// Common options
-	TMDbAPIKey     string   `json:"tmdb_api_key"`
-	OMDbAPIKey     string   `json:"omdb_api_key"`
-	TVDbAPIKey     string   `json:"tvdb_api_key"`
-	BatchMode      bool     `json:"batch_mode"`
-	Recursive      bool     `json:"recursive"`
-	LowerCase      bool     `json:"lowercase"`
-	SceneStyle     bool     `json:"scene_style"`
+	// API keys for metadata providers
+	TMDbAPIKey     string   `json:"tmdb_api_key"` // API key for The Movie Database
+	OMDbAPIKey     string   `json:"omdb_api_key"` // API key for Open Movie Database
+	TVDbAPIKey     string   `json:"tvdb_api_key"` // API key for The TV Database
+	BatchMode      bool     `json:"batch_mode"` // Run without interactive prompts
+	Recursive      bool     `json:"recursive"` // Process directories recursively
+	LowerCase      bool     `json:"lowercase"` // Convert filenames to lowercase
+	SceneStyle     bool     `json:"scene_style"` // Use dots instead of spaces in filenames
 	Separator      string   `json:"separator"`
 	FileExtensions []string `json:"file_extensions"`
-	Language       string   `json:"language"`
+	Language       string   `json:"language"` // Preferred language for metadata (ISO 639-1 code)
 	NoOverwrite    bool     `json:"no_overwrite"`
 	NoMetadata     bool     `json:"no_metadata"`
 	PreviewMode    bool     `json:"preview_mode"`
 	EnableMetadata bool     `json:"enable_metadata"`
 
-	// Provider selection
-	MovieProvider ProviderType `json:"movie_provider"`
-	TVProvider    ProviderType `json:"tv_provider"`
+	// Provider preferences
+	MovieProvider ProviderType `json:"movie_provider"` // Preferred movie metadata provider
+	TVProvider    ProviderType `json:"tv_provider"`    // Preferred TV show metadata provider
 
-	// Formatting options
-	MovieFormat string `json:"movie_format"`
-	TVFormat    string `json:"tv_format"`
-
-	// Directory organization options
-	MovieDirectory string `json:"movie_directory"` // Template for movie directory structure
-	TVDirectory    string `json:"tv_directory"`    // Template for TV show directory structure
+	// Format templates
+	MovieFormat string `json:"movie_format"` // Template for movie filename format
+	TVFormat    string `json:"tv_format"`    // Template for TV show filename format
+	MovieDirectory string `json:"movie_directory"` // Template for movie directory organization
+	TVDirectory    string `json:"tv_directory"`    // Template for TV show directory organization
 	OrganizeFiles  bool   `json:"organize_files"` // Whether to move files to organized directories
 }
 
