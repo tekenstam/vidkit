@@ -4,7 +4,7 @@ VidKit is an intelligent video file management system for media enthusiasts and 
 
 [![Release](https://img.shields.io/github/v/release/tekenstam/vidkit)](https://github.com/tekenstam/vidkit/releases/latest)
 [![Go Version](https://img.shields.io/github/go-mod/go-version/tekenstam/vidkit)](https://golang.org/doc/devel/release.html)
-[![License](https://img.shields.io/github/license/tekenstam/vidkit)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Test and Lint](https://github.com/tekenstam/vidkit/actions/workflows/test.yml/badge.svg)](https://github.com/tekenstam/vidkit/actions/workflows/test.yml)
 [![Integration Tests](https://github.com/tekenstam/vidkit/actions/workflows/integration.yml/badge.svg)](https://github.com/tekenstam/vidkit/actions/workflows/integration.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/tekenstam/vidkit)](https://goreportcard.com/report/github.com/tekenstam/vidkit)
