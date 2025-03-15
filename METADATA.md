@@ -218,7 +218,7 @@ Directory templates work similarly to filename templates but define the target d
 
 Command:
 ```bash
-vidkit --movie-dir "Movies/{title} ({year})" movie.mp4
+vidkit --movie-directory-template "Movies/{title} ({year})" movie.mp4
 ```
 
 Result:
@@ -231,7 +231,7 @@ New:      ~/Movies/The Matrix (1999)/The Matrix (1999) [1080p h264].mp4
 
 Command:
 ```bash
-vidkit --movie-dir "Movies/{title[0]}/{title} ({year})" movie.mp4
+vidkit --movie-directory-template "Movies/{title[0]}/{title} ({year})" movie.mp4
 ```
 
 Result:
@@ -244,7 +244,7 @@ New:      ~/Movies/T/The Matrix (1999)/The Matrix (1999) [1080p h264].mp4
 
 Command:
 ```bash
-vidkit --movie-dir "Movies/By Genre/{genre}/{title} ({year})" movie.mp4
+vidkit --movie-directory-template "Movies/By Genre/{genre}/{title} ({year})" movie.mp4
 ```
 
 Result:
@@ -257,7 +257,7 @@ New:      ~/Movies/By Genre/Action/The Matrix (1999)/The Matrix (1999) [1080p h2
 
 Command:
 ```bash
-vidkit --tv-dir "TV Shows/{title}/Season {season:02d}" tvshow.mp4
+vidkit --tv-directory-template "TV Shows/{title}/Season {season:02d}" tvshow.mp4
 ```
 
 Result:
@@ -270,7 +270,7 @@ New:      ~/TV Shows/Breaking Bad/Season 01/Breaking Bad S01E05 Gray Matter [108
 
 Command:
 ```bash
-vidkit --tv-dir "TV Shows/{network}/{title}/Season {season}" tvshow.mp4
+vidkit --tv-directory-template "TV Shows/{network}/{title}/Season {season}" tvshow.mp4
 ```
 
 Result:
@@ -363,14 +363,14 @@ Options:
   --separator      character to use as separator in filenames
   --no-overwrite   prevent relocation if it would overwrite a file
   --lang <code>    metadata language (ISO 639-1 code)
-  --movie-format   movie filename format template
-  --tv-format      TV episode filename format template
+  --movie-filename-template   movie filename format template (e.g., "{title} ({year}) [{resolution}]")
+  --tv-filename-template      TV episode filename format template (e.g., "{title} S{season:02d}E{episode:02d} {episode_title}")
   --preview        show what would be done without making changes
   --no-metadata    skip online metadata lookup
   --movie-provider select movie metadata provider (tmdb, omdb)
   --tv-provider    select TV show metadata provider (tvmaze, tvdb)
-  --movie-dir      directory template for movies
-  --tv-dir         directory template for TV shows
+  --movie-directory-template  directory template for movies (e.g., "Movies/{title[0]}/{title} ({year})")
+  --tv-directory-template     directory template for TV shows (e.g., "TV/{title}/Season {season:02d}")
   --organize       organize files into directories (default: true)
 ```
 

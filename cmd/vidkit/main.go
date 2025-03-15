@@ -326,7 +326,7 @@ func generateFilename(originalPath string, info *media.VideoInfo, metadata *meta
 		codec = videoStream.CodecName
 	}
 
-	// Apply template
+	// Apply movie filename template from configuration
 	template := cfg.MovieFilenameTemplate
 	if template == "" {
 		template = "{title} ({year}) [{resolution} {codec}]"
@@ -356,34 +356,27 @@ func generateFilename(originalPath string, info *media.VideoInfo, metadata *meta
 		filename = strings.ToLower(filename)
 	}
 
-	// Handle directory structure for movie
-	if cfg.OrganizeFiles && cfg.MovieDirectoryTemplate != "" {
-		// Apply template to directory as well
+	// Create organized output directory structure using templates if configured
+	if metadata.Title != "" && cfg.OrganizeFiles && cfg.MovieDirectoryTemplate != "" {
+		// Apply movie directory template
 		dirTemplate := cfg.MovieDirectoryTemplate
+		if dirTemplate == "" {
+			dirTemplate = "Movies/{title} ({year})"
+		}
 		directory := dirTemplate
-		
-		// Replace template variables in directory
 		directory = strings.ReplaceAll(directory, "{title}", metadata.Title)
 		directory = strings.ReplaceAll(directory, "{year}", fmt.Sprintf("%d", metadata.Year))
-		
-		// Replace genres if needed
 		if strings.Contains(directory, "{genre}") && len(metadata.Genres) > 0 {
 			directory = strings.ReplaceAll(directory, "{genre}", metadata.Genres[0])
 		} else {
 			directory = strings.ReplaceAll(directory, "{genre}", "Unknown")
 		}
-		
-		// Apply word separator to directory
 		if cfg.SceneStyle {
 			directory = strings.ReplaceAll(directory, " ", ".")
 		}
-		
-		// Apply lowercase to directory if needed
 		if cfg.Lowercase {
 			directory = strings.ToLower(directory)
 		}
-		
-		// Create the full path
 		fullPath := filepath.Join(baseDir, directory, filename+ext)
 		return fullPath
 	}
@@ -414,7 +407,7 @@ func generateTVFilename(originalPath string, info *media.VideoInfo, metadata *me
 		codec = videoStream.CodecName
 	}
 
-	// Apply template
+	// Apply TV show filename template from configuration
 	template := cfg.TVFilenameTemplate
 	if template == "" {
 		template = "{title} - S{season:02d}E{episode:02d} - {episode_title}"
@@ -464,46 +457,35 @@ func generateTVFilename(originalPath string, info *media.VideoInfo, metadata *me
 		filename = strings.ToLower(filename)
 	}
 
-	// Handle directory structure for TV shows
+	// Create organized output directory structure using templates if configured
 	if cfg.OrganizeFiles && cfg.TVDirectoryTemplate != "" {
-		// Apply template to directory as well
+		// Apply TV show directory template
 		dirTemplate := cfg.TVDirectoryTemplate
+		if dirTemplate == "" {
+			dirTemplate = "TV/{title}/Season {season:02d}"
+		}
 		directory := dirTemplate
-		
-		// Replace template variables in directory
 		directory = strings.ReplaceAll(directory, "{title}", metadata.Title)
 		directory = strings.ReplaceAll(directory, "{year}", fmt.Sprintf("%d", metadata.Year))
-		
-		// Replace special formats for season/episode in directory
 		if strings.Contains(directory, "{season:02d}") {
 			directory = strings.ReplaceAll(directory, "{season:02d}", fmt.Sprintf("%02d", metadata.Season))
 		} else {
 			directory = strings.ReplaceAll(directory, "{season}", fmt.Sprintf("%d", metadata.Season))
 		}
-		
-		// Replace network if needed
 		if strings.Contains(directory, "{network}") {
 			directory = strings.ReplaceAll(directory, "{network}", metadata.Network)
 		}
-		
-		// Replace genres if needed
 		if strings.Contains(directory, "{genre}") && len(metadata.Genres) > 0 {
 			directory = strings.ReplaceAll(directory, "{genre}", metadata.Genres[0])
 		} else {
 			directory = strings.ReplaceAll(directory, "{genre}", "Unknown")
 		}
-		
-		// Apply word separator to directory
 		if cfg.SceneStyle {
 			directory = strings.ReplaceAll(directory, " ", ".")
 		}
-		
-		// Apply lowercase to directory if needed
 		if cfg.Lowercase {
 			directory = strings.ToLower(directory)
 		}
-		
-		// Create the full path
 		fullPath := filepath.Join(baseDir, directory, filename+ext)
 		return fullPath
 	}
@@ -536,10 +518,10 @@ func main() {
 	previewMode := flag.Bool("preview", false, "Preview mode (don't modify files)")
 	showVersion := flag.Bool("version", false, "Show version information")
 	
-	// Language and format options
+	// Language and filename template options
 	lang := flag.String("lang", "en", "Metadata language (ISO 639-1 code)")
-	movieFilenameTemplate := flag.String("movie-filename-template", "", "Template for movie filenames")
-	tvFilenameTemplate := flag.String("tv-filename-template", "", "Template for TV show filenames")
+	movieFilenameTemplate := flag.String("movie-filename-template", "", "Template for movie filenames (e.g., '{title} ({year}) [{resolution}]')")
+	tvFilenameTemplate := flag.String("tv-filename-template", "", "Template for TV show filenames (e.g., '{title} S{season:02d}E{episode:02d} {episode_title}')")
 	separator := flag.String("separator", "", "Character to use as separator in filenames")
 	movieProvider := flag.String("movie-provider", "", "Select movie metadata provider (tmdb, omdb)")
 	tvProvider := flag.String("tv-provider", "", "Select TV show metadata provider (tvmaze, tvdb)")
@@ -547,7 +529,6 @@ func main() {
 	// Directory organization templates
 	movieDirectoryTemplate := flag.String("movie-directory-template", "", "Template for movie directory organization (e.g., 'Movies/{genre}/{title} ({year})')")
 	tvDirectoryTemplate := flag.String("tv-directory-template", "", "Template for TV show directory organization (e.g., 'TV/{genre}/{title}/Season {season:02d}')")
-
 	flag.Parse()
 
 	// Show version and exit if requested
